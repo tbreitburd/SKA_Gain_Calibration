@@ -4,3 +4,5 @@ Report/*
 !Report/Report.tex
 !Report/Report.pdf
 !Report/refs.bib
+
+harp_beam/__pycache__/
