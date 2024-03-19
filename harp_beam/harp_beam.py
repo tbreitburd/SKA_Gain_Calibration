@@ -111,20 +111,17 @@ def smodes_eval(order, alpha_tm, alpha_te, theta, phi):
 def wrapTo2Pi(phi):
     return phi % (2 * np.pi)
 
-def compute_EEPs(theta, phi):
+def compute_EEPs(mat, theta, phi):
 
+    theta_ = np.copy(theta)
+    phi_ = np.copy(phi)
     ind = theta < 0
-    theta[ind] = -theta[ind]
-    phi[ind] = wrapTo2Pi(phi[ind] + np.pi)
+    theta_[ind] = -theta_[ind]
+    phi_[ind] = wrapTo2Pi(phi_[ind] + np.pi)
 
     freq = 100
     c0 = 299792458  # speed of light
     k0 = 2 * np.pi * freq / c0 * 10**6  # wavenumber
-    antenna = 'SKALA41'  # antenna name
-    layout = 'random'  # array layout
-    data_folder = 'harp_beam'
-    filename_eep = f"data_EEPs_{antenna}_{layout}_{freq}MHz.mat"
-    mat = scipy.io.loadmat(filename_eep)
 
     max_order = int(mat['max_order'])
     num_mbf = int(mat['num_mbf'])
@@ -145,10 +142,10 @@ def compute_EEPs(theta, phi):
     num_beam = len(coeffs_polY[0])
     num_mbf = len(alpha_tm)
 
-    ux = np.sin(theta) * np.cos(phi)
-    uy = np.sin(theta) * np.sin(phi)
+    ux = np.sin(theta_) * np.cos(phi_)
+    uy = np.sin(theta_) * np.sin(phi_)
 
-    v_mbf_theta, v_mbf_phi = smodes_eval(max_order, alpha_tm, alpha_te, theta, phi)
+    v_mbf_theta, v_mbf_phi = smodes_eval(max_order, alpha_tm, alpha_te, theta_, phi_)
 
     # Beam assembling
     v_theta_polY = np.zeros((num_dir, num_beam), dtype=np.complex128)
