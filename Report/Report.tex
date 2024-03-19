@@ -151,9 +151,51 @@
 
 In this mini project, an algorithm for the retrieval of gain solutions for a single SKA-low station is implemented. One SKA1-low station comprises 256 antennae that cover a frequency range of 50-350 MHz. The gain retrieval algorithm is used in order to calibrate the stations, to account for known instrumental effects which occur in the analog chain: Low-Noise Amplifiers (LNA), cables, and other analog components. Because it can be summarised into a series of linear transformations of the input signal, the gain calibration can be done with a single complex-valued gain for each antenna.
 
+\section{Calibration Problem}
 
+In this short section, equations defining the problem of calibration are listed. First, the voltage that is input of the analog chain, for antenna $i$, frequency $f$, and feed port $p$, is given by:
 
+\begin{equation}
+    v_{i, p} = G_{i} \mathbf{F}_{i,p}(\theta, \phi) \cdot \mathbf{E}(\theta, \phi)
+\end{equation}
 
-\section{The Problem}
+where $\theta$ and $\phi$ are the zenith and azimuth angle, respectively. $\mathbf{E}$ is the incident electric field from the sky. $\mathbf{F}_{i,p}$ is the Embedded Element Pattern (EEP) of antenna $i$ for feed port $p$. And finally, $G_{i}$ is the complex gain for antenna $i$.
+
+Then comes the visibilities which are the time cross-correlation of the voltage signals from two antennae, $i$ and $j$, and feed port $p$. There are the measured visibilities $R_{ij,p}$ which can be modeled as $R_{ij,p} = G_{i}G^{*}_{j}M_{ij,p}$ where $M_{ij,p}$ are model visibilities and they are given by:
+
+\begin{equation}
+    M_{ij,p} = \int\int (\mathbf{F}_{i,p}(\theta, \phi) \cdot \mathbf{F}_{j,p}^{*}(\theta, \phi))T_{b}(\theta, \phi)e^{-j\mathbf{k} \cdot (\mathbf{r_{i}}-\mathbf{r_{j}})} \sin\theta d\theta d\phi
+\end{equation}
+
+Where $\mathbf{F}_{j,p}^{*}(\theta, \phi)$ is the complex conjugate of the EEP of antenna $j$ for feed port $p$, $T_{b}(\theta, \phi)$ is the brightness temperature of the sky, and $\mathbf{r}_{i}$ is the position of antenna i and $\mathbf{k}$ is the wavevector with wavenumber k such that: $\mathbf{k} = k \sin \theta \cos \phi \mathbf{\hat{x}} + k \sin \theta \sin \phi \mathbf{\hat{y}} + k \cos \theta \mathbf{\hat{z}}$. 
+
+By combining visibilities for all feed ports, the measured visibilities can be written as $R_{ij} = R_{ij, X} + R_{ij, Y}$ and the model visibilities: $M_{ij} = M_{ij, X} + M_{ij, Y}$. Thus, equations (1) and (2) can be written in matrix form as: 
+
+\begin{equation}
+    \mathbf{R} = \mathbf{G} \mathbf{M} \mathbf{G}^H
+\end{equation}
+
+The calibration problem is to find the gains $G_{i}$ that minimize the difference between the measured visibilities and the model visibilities. And this, taking equation (3), can be written as:
+
+\begin{equation}
+    \mathbf{\hat{G}} = \arg\min_{\mathbf{G_{i}}} ||\mathbf{R} - \mathbf{G} \mathbf{M} \mathbf{G}^H||_{F}
+\end{equation}
+
+Where $\mathbf{\hat{G}}$ is therefore an estimator of the gain that solves Eq (3), and $||\cdot||_{F}$ is the Frobenius norm of the matrix.
+
+\chapter{Questions}
+
+\section{Equation (4) and multiplying all gains by the same phase factor}
+
+Equation (4) summarises the calibration problem. It states that the estimate for the gain solution should minimise the difference between the measured visibilities and the modeled visibilities, with respect to the gains $\mathbf{G_{i}}$. The Frobenius norm is used to measure this difference between the two matrices and can be described as the squareroot of the total squared error. 
+
+Now, from Eq (1) and (2), both the received and modelled visibilities are dependent on the sky being observed. Thus, in the context of calibration, the sky has to be known in order to solve for the gains.
+
+All matrices in Eq. (4) are of size 256$\times$256. The gains matrix is diagonal, with diagonal elements being $G_{i}$, the gain for antenna $i$. Measured and modelled visibilities matrices are complex valued, and symmetric, since the cross-correlation of two antennae should be undirected.
+
+By applying the Hermitian transpose to the gains matrix, it ensures the gains of each antenna is used.
+
+\section{Power of Embedded Element Patterns (EEPs) and the Average Element Pattern (AEP)}
+
 
 \end{document}
