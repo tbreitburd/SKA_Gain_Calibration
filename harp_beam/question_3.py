@@ -34,14 +34,24 @@ G_EEPs, diff_EEPs, abs_error_EEPs, amp_diff_EEPs, phase_diff_EEPs = StEFCal(
     M_EEPs, R, tau, i_max, P, g_sol
 )
 
-
 # Plot the convergence of the algorithm
-# (abs. error of gain sols, of their amplitude and their phase difference)
+# just for the absolute error of gain sols
 
-plot_convergence(abs_error_AEP, i_max, "Absolute", "AEP")
-plot_convergence(amp_diff_AEP, i_max, "Amplitude", "AEP")
-plot_convergence(phase_diff_AEP, i_max, "Phase", "AEP")
+plot_convergence(diff_AEP, i_max, "Difference", "AEP")
+plot_convergence(diff_EEPs, i_max, "Difference", "EEPs")
 
-plot_convergence(abs_error_EEPs, i_max, "Absolute", "EEPs")
-plot_convergence(amp_diff_EEPs, i_max, "Amplitude", "EEPs")
-plot_convergence(phase_diff_EEPs, i_max, "Phase", "EEPs")
+# Get the number of iterations for the AEP and EEPs model matrices
+
+print("Number of iterations for the AEP model matrix: ", len(abs_error_AEP))
+print("Number of iterations for the EEPs model matrix: ", len(abs_error_EEPs))
+
+
+# Run the optimised version of the SteEFCal algorithm for the AEP and EEPs model matrices
+# and get the number of iterations
+
+# G_AEP_opt, diff_AEP_opt, _, __, ___ = StEFCal_opti(
+#    M_AEP, R, tau, len(abs_error_AEP), P, g_sol
+# )
+# G_EEPs_opt, diff_EEPs_opt, _, __, ____ = StEFCal_opti(
+#    M_EEPs, R, tau, len(abs_error_EEPs), P, g_sol
+# )
