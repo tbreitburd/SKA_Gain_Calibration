@@ -262,3 +262,57 @@ def StEFCal(M, R, tau, i_max, P, g_sol):
         )
 
     return G_new, diff, abs_error, amp_diff, phase_diff
+
+
+def compute_array_pattern(
+    G_sol, v_theta, v_phi, x_pos, y_pos, theta, phi, theta_0, phi_0, frequency
+):
+    """
+    @brief Compute the array pattern for a given set of EEPs
+
+    @param G_sol Exact gain solution, np.array, complex
+    @param v_theta EEPs for theta, np.array, complex
+    @param v_phi EEPs for phi, np.array, complex
+    @param x_pos x position of antennas, np.array, float
+    @param y_pos y position of antennas, np.array, float
+    @param theta Zenith angle, np.array, float
+    @param phi Azimuth angle, np.array, float
+    @param theta_0 Zenith angle of the source, float
+    @param phi_0 Azimuth angle of the source, float
+    @param frequency Frequency of the source, float
+
+    @return np.array (complex double) array_pattern
+    """
+
+    freq = frequency * (10**6)  # frequency
+    c0 = 299792458  # speed of light
+    k0 = 2 * np.pi / (c0 / freq)  # wavenumber
+
+    g = np.diag(G_sol)
+
+    EEP = np.sqrt(np.abs(v_theta) ** 2 + np.abs(v_phi) ** 2)
+
+    array_pattern = np.zeros((theta.shape[0]), dtype=complex)
+    phase_factor = np.zeros((theta.shape[0]), dtype=complex)
+
+    for i in range(256):
+        w = np.exp(
+            1j
+            * k0
+            * (
+                (x_pos[i] * np.sin(theta_0) * np.cos(phi_0))
+                + (y_pos[i] * np.sin(theta_0) * np.sin(phi_0))
+            )
+        )
+        phase_factor = np.exp(
+            -1j
+            * k0
+            * (
+                (x_pos[i] * np.sin(theta) * np.cos(phi))
+                + (y_pos[i] * np.sin(theta) * np.cos(phi))
+            )
+        )
+
+        array_pattern += w * g[i] * EEP[:, i] * phase_factor[:, 0]
+
+    return np.abs(array_pattern)
