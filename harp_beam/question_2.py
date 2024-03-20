@@ -42,12 +42,12 @@ v_theta_polY, v_phi_polY, v_theta_polX, v_phi_polX = compute_EEPs(SKA_data, thet
 # the components need to be combined to get the EEPs
 
 # Combine the EEPs
-v_polX = np.abs(np.sqrt((v_theta_polX) ** 2 + (v_phi_polX) ** 2))
-v_polY = np.abs(np.sqrt((v_theta_polY) ** 2 + (v_phi_polY) ** 2))
+v_polX = np.sqrt(np.abs(v_theta_polX) ** 2 + np.abs(v_phi_polX) ** 2)
+v_polY = np.sqrt(np.abs(v_theta_polY) ** 2 + np.abs(v_phi_polY) ** 2)
 
 # Convert to dBV
-v_polX = 10 * np.log10(v_polX)
-v_polY = 10 * np.log10(v_polY)
+v_polX = 20 * np.log10(v_polX)
+v_polY = 20 * np.log10(v_polY)
 
 # Plot the EEPs and AEP
 plot_EEP_AEP(theta, v_polX, "polX")
