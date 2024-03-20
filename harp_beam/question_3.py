@@ -45,6 +45,3 @@ plot_convergence(phase_diff_AEP, i_max, "Phase", "AEP")
 plot_convergence(abs_error_EEPs, i_max, "Absolute", "EEPs")
 plot_convergence(amp_diff_EEPs, i_max, "Amplitude", "EEPs")
 plot_convergence(phase_diff_EEPs, i_max, "Phase", "EEPs")
-
-
-# Save the most accurate gain solution:

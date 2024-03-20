@@ -262,7 +262,3 @@ def StEFCal(M, R, tau, i_max, P, g_sol):
         )
 
     return G_new, diff, abs_error, amp_diff, phase_diff
-
-
-def StEFCal_optim(M, R, tau, i_max, P):
-    return 0
