@@ -1,80 +1,70 @@
-## MPHil in data intensive science
-# Astronomy in the SKA-era mini project
-# SKA-low mini project
-# 01.03.2024
-# Q. Gueuning (qdg20@cam.ac.uk) and O. O'Hara
-# see license file attached
+"""!@file harp_beam.py
+@brief Module containing tools for calibrating the SKA-LOW station
+
+@details This module contains tools to calibrate the SKA-LOW station and is part
+of the SKA-low mini project. It contains functions to calculate the spherical wave modes,
+the EEPs, and to estimate the gains using the SteEFCal algorithm.
+
+@author Created by Q. Gueuning (qdg20@cam.ac.uk) and O. O'Hara on 01/03/2024
+Modified by T.Breitburd on 19/03/2024
+"""
 
 import numpy as np
-import scipy.io
 from scipy.special import lpmv, factorial
+
 
 def legendre(deg, x):
     """
-    Calculate the associated Legendre function for integer orders and degree at value x.
+    @brief Calculate the associated Legendre function for integer orders and degree at value x.
 
-    Parameters
-    ----------
-    deg : float
-        Degree of the Legendre function.
-    x : float
-        Position to evaluate function
+    @param deg Degree of the Legendre function, float
+    @param x Position to evaluate function, float
 
-    Returns
-    -------
-        return : np.array
-        Legendre function for all integer orders from 0 to deg.
+    @return np.array Legendre function for all integer orders from 0 to deg.
     """
     return np.asarray([lpmv(i, deg, x) for i in range(deg + 1)])[:, 0, :]
 
+
 def legendre3(n, u):
     """
-    Calculate all associated Legendre functions up to max order n at value x.
+    @brief Calculate all associated Legendre functions up to max order n at value x.
 
-    Parameters
-    ----------
-    deg : float
-        Max degree of the Legendre function.
-    x : float
-        Position to evaluate function
+    @param deg Degree of the Legendre function, float
+    @param x Position to evaluate function, float
 
-    Returns
-    -------
-        return : np.array
-        Legendre functions (Pnm,Pnm/costheta,dPnmdsintheta) for all integer orders from 0 to deg.
+    @return np.array Legendre functions (Pnm,Pnm/costheta,dPnmdsintheta)
+    for all integer orders from 0 to deg.
     """
     pn = legendre(n, u)
-    pnd = np.divide(pn, np.ones_like(n + 1) * np.sqrt(1 - u ** 2))
+    pnd = np.divide(pn, np.ones_like(n + 1) * np.sqrt(1 - u**2))
 
     mv = np.arange(n)
 
     dpns = np.zeros((n + 1, len(u[0])))
-    dpns[:-1, :] = np.multiply(-(mv[:, None]), np.divide(u, 1 - u ** 2)) * pn[mv, :] - pnd[mv + 1, :]
-    dpns[n, :] = np.multiply(-n, np.divide(u, 1 - u ** 2)) * pn[n, :];
-    dpns *= np.sqrt(1 - u ** 2)
+    dpns[:-1, :] = (
+        np.multiply(-(mv[:, None]), np.divide(u, 1 - u**2)) * pn[mv, :]
+        - pnd[mv + 1, :]
+    )
+    dpns[n, :] = np.multiply(-n, np.divide(u, 1 - u**2)) * pn[n, :]
+    dpns *= np.sqrt(1 - u**2)
     return pn, pnd, dpns
+
 
 def smodes_eval(order, alpha_tm, alpha_te, theta, phi):
     """
-    Calculate spherical wave modes TE and TM according to definitions in the book J.E. Hansen, Spherical near-field measurements
+    @brief Calculate spherical wave modes TE and TM according to definitions in the book:
+    J.E. Hansen, Spherical near-field measurements
 
-    Parameters
-    ----------
-    order : float
-        Max order of the Legendre function.
-    alpha_tm : np.array, complex double
-        coefficients for TM modes, 3d array of size (num_mbf, 2 * max_order + 1, max_order)
-    alpha_te : np.array, complex double
-        coefficients for TE modes, 3d array of size (num_mbf, 2 * max_order + 1, max_order)
-    theta : np.araay, float
-        zenith angle
-    phi : np.array, float
-        azimuth angle
-    Returns
-    -------
-        return : np.array, complex double
-        gvv 
-        ghh 
+    @param order Max order of the Legendre function, float
+    @param alpha_tm coefficients for TM modes, 3d array of size
+    (num_mbf, 2 * max_order + 1, max_order)
+    @param alpha_te coefficients for TE modes, 3d array of size
+    (num_mbf, 2 * max_order + 1, max_order)
+    @param theta Zenith angle, np.array, float
+    @param phi Azimuth angle, np.array, float
+
+    @return np.array (complex double) gvv
+    @return np.array (complex double) ghh
     """
     tol = 1e-5
     theta[theta < tol] = tol
@@ -92,7 +82,15 @@ def smodes_eval(order, alpha_tm, alpha_te, theta, phi):
         pmn = np.row_stack((np.flipud(pnd[1:]), pnd))
         dpmn = np.row_stack((np.flipud(dpns[1:]), dpns))
 
-        Nv = 2 * np.pi * n * (n + 1) / (2 * n + 1) * factorial(n + np.abs(mv)) / factorial(n - abs(mv))
+        Nv = (
+            2
+            * np.pi
+            * n
+            * (n + 1)
+            / (2 * n + 1)
+            * factorial(n + np.abs(mv))
+            / factorial(n - abs(mv))
+        )
         Nf = np.sqrt(2 * Nv)
         ee = EE[mv + order]
         qq = -ee * dpmn
@@ -108,10 +106,24 @@ def smodes_eval(order, alpha_tm, alpha_te, theta, phi):
 
     return gvv.T, ghh.T
 
+
 def wrapTo2Pi(phi):
     return phi % (2 * np.pi)
 
+
 def compute_EEPs(mat, theta, phi):
+    """
+    @brief Compute the EEPs for a given set of angles theta and phi.
+
+    @param mat Dictionary containing the data from the .mat file.
+    @param theta Zenith angle, np.array, float
+    @param phi Azimuth angle, np.array, float
+
+    @return np.array (complex double) v_theta_polY
+    @return np.array (complex double) v_phi_polY
+    @return np.array (complex double) v_theta_polX
+    @return np.array (complex double) v_phi_polX
+    """
 
     theta_ = np.copy(theta)
     phi_ = np.copy(phi)
@@ -123,19 +135,25 @@ def compute_EEPs(mat, theta, phi):
     c0 = 299792458  # speed of light
     k0 = 2 * np.pi * freq / c0 * 10**6  # wavenumber
 
-    max_order = int(mat['max_order'])
-    num_mbf = int(mat['num_mbf'])
-    coeffs_polX = np.array(mat['coeffs_polX'])
-    coeffs_polY = np.array(mat['coeffs_polY'])
-    alpha_te = np.array(mat['alpha_te'])
-    alpha_tm = np.array(mat['alpha_tm'])
-    pos_ant = np.array(mat['pos_ant'])
-    x_pos = pos_ant[:,0]
-    y_pos = pos_ant[:,1]
+    max_order = int(mat["max_order"])
+    num_mbf = int(mat["num_mbf"])
+    coeffs_polX = np.array(mat["coeffs_polX"])
+    coeffs_polY = np.array(mat["coeffs_polY"])
+    alpha_te = np.array(mat["alpha_te"])
+    alpha_tm = np.array(mat["alpha_tm"])
+    pos_ant = np.array(mat["pos_ant"])
+    x_pos = pos_ant[:, 0]
+    y_pos = pos_ant[:, 1]
 
     # reshaping
-    alpha_te = np.ndarray.transpose(np.reshape(alpha_te, (num_mbf, 2 * max_order + 1, max_order), order='F'), (0, 2, 1))
-    alpha_tm = np.ndarray.transpose(np.reshape(alpha_tm, (num_mbf, 2 * max_order + 1, max_order), order='F'), (0, 2, 1))
+    alpha_te = np.ndarray.transpose(
+        np.reshape(alpha_te, (num_mbf, 2 * max_order + 1, max_order), order="F"),
+        (0, 2, 1),
+    )
+    alpha_tm = np.ndarray.transpose(
+        np.reshape(alpha_tm, (num_mbf, 2 * max_order + 1, max_order), order="F"),
+        (0, 2, 1),
+    )
 
     num_dir = len(theta)
     num_ant = len(pos_ant)
@@ -152,18 +170,22 @@ def compute_EEPs(mat, theta, phi):
     v_phi_polY = np.zeros((num_dir, num_beam), dtype=np.complex128)
     v_theta_polX = np.zeros((num_dir, num_beam), dtype=np.complex128)
     v_phi_polX = np.zeros((num_dir, num_beam), dtype=np.complex128)
-    phase_factor = np.exp(1j * k0 * (ux*x_pos + uy*y_pos))
+    phase_factor = np.exp(1j * k0 * (ux * x_pos + uy * y_pos))
     for i in range(num_mbf):
         p_thetai = v_mbf_theta[:, i]
         p_phii = v_mbf_phi[:, i]
 
-        c_polY = np.matmul(phase_factor,coeffs_polY[np.arange(num_ant) * num_mbf + i, :])
-        c_polX = np.matmul(phase_factor,coeffs_polX[np.arange(num_ant) * num_mbf + i, :])
+        c_polY = np.matmul(
+            phase_factor, coeffs_polY[np.arange(num_ant) * num_mbf + i, :]
+        )
+        c_polX = np.matmul(
+            phase_factor, coeffs_polX[np.arange(num_ant) * num_mbf + i, :]
+        )
 
-        v_theta_polY += p_thetai[:,None] * c_polY
-        v_phi_polY += p_phii[:,None] * c_polY
-        v_theta_polX += p_thetai[:,None] * c_polX
-        v_phi_polX += p_phii[:,None] * c_polX
+        v_theta_polY += p_thetai[:, None] * c_polY
+        v_phi_polY += p_phii[:, None] * c_polY
+        v_theta_polX += p_thetai[:, None] * c_polX
+        v_phi_polX += p_phii[:, None] * c_polX
 
     v_theta_polY *= np.conj(phase_factor)
     v_phi_polY *= np.conj(phase_factor)
@@ -171,3 +193,76 @@ def compute_EEPs(mat, theta, phi):
     v_phi_polX *= np.conj(phase_factor)
 
     return v_theta_polY, v_phi_polY, v_theta_polX, v_phi_polX
+
+
+def StEFCal(M, R, tau, i_max, P, g_sol):
+    """
+    @brief Estimate the gains using the SteEFCal algorithm.
+
+    @param M Model covariance matric of observed scene, diagonal set to 0, np.array, complex
+    @param R array of covariance matrix, diagonal set to 0, np.array, complex
+    @param tau Tolerance, float
+    @param i_max Maximum number of iterations, int
+    @param P Number of antennas, int
+    @param g_sol Exact gain solution, np.array, complex
+
+    @return np.array (complex double) G_new
+    @return np.array (float) diff
+    @return np.array (float) abs_error
+    @return np.array (float) amp_diff
+    @return np.array (float) phase_diff
+    """
+
+    G_old = np.identity(256, dtype=complex)
+    G_new = np.identity(256, dtype=complex)
+    diff = []
+    g_new = np.array(np.diag(G_new), dtype=complex)
+    g_old = np.array(np.diag(G_old), dtype=complex)
+
+    abs_error = []
+    phase_diff = []
+    amp_diff = []
+
+    for i in range(0, i_max):
+        for p in range(0, P):
+            z = np.dot(G_old, M[:, p])
+            g_p = np.dot(np.conjugate(R[:, p]), z) / (np.dot(np.conjugate(z), z))
+            g_new[p] = g_p.flatten()[0]
+
+        G_new = np.diag(g_new)
+
+        # Check G_new is diagonal
+        # if not np.allclose(G_new, np.diag(np.diagonal(G_new))):
+        #    raise ValueError('G_new is not diagonal')
+
+        # Check if the difference is smaller than tau
+        if i % 2 == 0:
+            norm_diff = np.linalg.norm(g_new - g_old, ord=2)
+            norm_g = np.linalg.norm(g_new, ord=2)
+            diff.append(norm_diff / norm_g)
+            # Get the absolute error between the estimated gains and the true gains
+
+            if norm_diff / norm_g <= tau:
+                break
+            else:
+                G_new = (G_new + G_old) / 2
+        G_old = G_new.copy()
+
+        abs_error.append(
+            np.linalg.norm(np.abs(g_new) - np.abs(g_sol))
+            / np.linalg.norm(np.abs(g_new))
+        )
+        amp_diff.append(
+            np.linalg.norm(np.abs(g_new) - np.abs(g_sol))
+            / np.linalg.norm(np.abs(g_new))
+        )
+        phase_diff.append(
+            np.linalg.norm(np.angle(g_new) - np.angle(g_sol))
+            / np.linalg.norm(np.angle(g_new))
+        )
+
+    return G_new, diff, abs_error, amp_diff, phase_diff
+
+
+def StEFCal_optim(M, R, tau, i_max, P):
+    return 0
