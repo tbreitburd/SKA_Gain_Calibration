@@ -37,8 +37,8 @@ G_EEPs, diff_EEPs, abs_error_EEPs, amp_diff_EEPs, phase_diff_EEPs = StEFCal(
 # Plot the convergence of the algorithm
 # just for the absolute error of gain sols
 
-plot_convergence(diff_AEP, i_max, "Difference", "AEP")
-plot_convergence(diff_EEPs, i_max, "Difference", "EEPs")
+plot_convergence(diff_AEP, i_max, "AEP", "Difference")
+plot_convergence(diff_EEPs, i_max, "EEPs", "Difference")
 
 # Get the number of iterations for the AEP and EEPs model matrices
 

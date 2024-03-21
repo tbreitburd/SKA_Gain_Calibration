@@ -38,13 +38,13 @@ G_EEPs, diff_EEPs, abs_error_EEPs, amp_diff_EEPs, phase_diff_EEPs = StEFCal(
 # Plot the convergence of the algorithm
 # (abs. error of gain sols, of their amplitude and their phase difference)
 
-plot_convergence(abs_error_AEP, i_max, "Absolute", "AEP")
-plot_convergence(amp_diff_AEP, i_max, "Amplitude", "AEP")
-plot_convergence(phase_diff_AEP, i_max, "Phase", "AEP")
+plot_convergence(abs_error_AEP, i_max, "AEP", "Absolute")
+plot_convergence(amp_diff_AEP, i_max, "AEP", "Amplitude")
+plot_convergence(phase_diff_AEP, i_max, "AEP", "Phase")
 
-plot_convergence(abs_error_EEPs, i_max, "Absolute", "EEPs")
-plot_convergence(amp_diff_EEPs, i_max, "Amplitude", "EEPs")
-plot_convergence(phase_diff_EEPs, i_max, "Phase", "EEPs")
+plot_convergence(abs_error_EEPs, i_max, "EEPs", "Absolute")
+plot_convergence(amp_diff_EEPs, i_max, "EEPs", "Amplitude")
+plot_convergence(phase_diff_EEPs, i_max, "EEPs", "Phase")
 
 
 # Get the minimum error achieved in the AEP and EEPs model matrices
