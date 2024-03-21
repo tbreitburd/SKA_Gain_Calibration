@@ -79,22 +79,22 @@ G_EEPs, diff_EEPs, abs_error_EEPs, amp_diff_EEPs, phase_diff_EEPs = StEFCal(
 # ----------------------------------------------
 
 P_true_X = compute_array_pattern(
-    G_true, v_theta_polX, v_phi_polX, x_pos, y_pos, theta, 0, 0, 0, 100
+    G_true, 1, v_theta_polX, v_phi_polX, x_pos, y_pos, theta, 0, 0, 0, 100
 )
 P_EEPs_X = compute_array_pattern(
-    G_EEPs, v_theta_polX, v_phi_polX, x_pos, y_pos, theta, 0, 0, 0, 100
+    G_EEPs, 1, v_theta_polX, v_phi_polX, x_pos, y_pos, theta, 0, 0, 0, 100
 )
 P_AEP_X = compute_array_pattern(
-    G_AEP, v_theta_polX, v_phi_polX, x_pos, y_pos, theta, 0, 0, 0, 100
+    G_AEP, 1, v_theta_polX, v_phi_polX, x_pos, y_pos, theta, 0, 0, 0, 100
 )
 P_true_Y = compute_array_pattern(
-    G_true, v_theta_polY, v_phi_polY, x_pos, y_pos, theta, 0, 0, 0, 100
+    G_true, 1, v_theta_polY, v_phi_polY, x_pos, y_pos, theta, 0, 0, 0, 100
 )
 P_EEPs_Y = compute_array_pattern(
-    G_EEPs, v_theta_polY, v_phi_polY, x_pos, y_pos, theta, 0, 0, 0, 100
+    G_EEPs, 1, v_theta_polY, v_phi_polY, x_pos, y_pos, theta, 0, 0, 0, 100
 )
 P_AEP_Y = compute_array_pattern(
-    G_AEP, v_theta_polY, v_phi_polY, x_pos, y_pos, theta, 0, 0, 0, 100
+    G_AEP, 1, v_theta_polY, v_phi_polY, x_pos, y_pos, theta, 0, 0, 0, 100
 )
 
 

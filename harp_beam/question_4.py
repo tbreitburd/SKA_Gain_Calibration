@@ -52,4 +52,6 @@ min_abs_error_AEP = min(abs_error_AEP)
 min_abs_error_EEPs = min(abs_error_EEPs)
 
 print("Minimum absolute error achieved in the AEP model matrix: ", min_abs_error_AEP)
+print("Reached at iteration number: ", np.argmin(abs_error_AEP))
 print("Minimum absolute error achieved in the EEPs model matrix: ", min_abs_error_EEPs)
+print("Reached at iteration number: ", np.argmin(abs_error_EEPs))

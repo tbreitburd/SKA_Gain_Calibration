@@ -9,7 +9,7 @@
 import numpy as np
 from harp_beam import compute_EEPs
 import scipy.io
-from plot_funcs import plot_EEP_AEP
+from plot_funcs import plot_EEP_AEP, plot_antennae_positions
 import os
 
 # Load the EEPs
@@ -21,6 +21,9 @@ SKA_data = scipy.io.loadmat(filename_eep)
 pos_ant = np.array(SKA_data["pos_ant"])
 x_pos = pos_ant[:, 0]
 y_pos = pos_ant[:, 1]
+
+# Plot the positions of the antennae
+plot_antennae_positions(x_pos, y_pos)
 
 # Define the angles over which to get EEPs
 # Here we want to get EEps for theta = [ -pi/2, pi/2] and phi = 0
