@@ -12,6 +12,34 @@ import matplotlib.pyplot as plt
 import os
 
 
+def plot_antennae_positions(x_pos, y_pos):
+    """
+    @brief Plot the positions of the antennae.
+
+    @param x_pos x positions of the antennae, np.array, float
+    @param y_pos y positions of the antennae, np.array, float
+
+    @return Plot of the positions of the antennae.
+    """
+    plt.style.use("ggplot")
+
+    plt.scatter(x_pos, y_pos, marker="x", color="grey")
+    plt.xlabel("x coordinate")
+    plt.ylabel("y coordinate")
+    plt.title("Antennae positions")
+
+    plt.tight_layout()
+
+    # Save the plot
+    project_dir = os.getcwd()
+    plot_dir = os.path.join(project_dir, "Plots")
+    if not os.path.exists(plot_dir):
+        os.makedirs(plot_dir)
+    plot_path = os.path.join(plot_dir, "station.png")
+    plt.savefig(plot_path)
+    plt.close()
+
+
 def plot_EEP_AEP(theta, EEP, pol):
     """
     @brief Plot the EEPs and AEPs for a given polarization.
@@ -56,14 +84,17 @@ def plot_convergence(errors, iteration_number, model, error_type):
     @return Plot of the absolute errors of the gain solutions vs the iteration number.
     """
 
+    plt.figure(figsize=(4, 4))
     plt.plot(errors[:iteration_number])
     plt.xlabel("Iteration")
     plt.ylabel(error_type + " absolute error")
     plt.title(
         error_type
-        + " absolute error vs iteration number for the"
+        + " absolute error vs iteration number "
+        + "\n for the "
         + model
-        + " model matrix"
+        + " model matrix",
+        fontsize=8,
     )
     plt.grid()
     plt.tight_layout()
@@ -168,10 +199,13 @@ def plot_station_beam_2D(x, y, P_dB, frequency, model):
     plt.style.use("ggplot")
     fig, ax = plt.subplots(1, 1, figsize=(6, 6))
 
-    ax.pcolormesh(x, y, P_dB, shading="auto")
+    p_min, p_max = np.min(P_dB), np.max(P_dB)
+
+    c = ax.pcolormesh(x, y, P_dB, vmin=p_min, vmax=p_max, shading="auto")
+    fig.colorbar(c, ax=ax)
     ax.set_xlabel("x")
     ax.set_ylabel("y")
-    ax.set_title("2D Station beam, frequency = " + str(frequency) + "MHz")
+    ax.set_title(model + " 2D Station beam, frequency = " + str(frequency) + "MHz")
 
     plt.tight_layout()
 
@@ -180,6 +214,11 @@ def plot_station_beam_2D(x, y, P_dB, frequency, model):
     plot_dir = os.path.join(project_dir, "Plots")
     if not os.path.exists(plot_dir):
         os.makedirs(plot_dir)
-    plot_path = os.path.join(plot_dir, "Station_beam_2D_" + model + ".png")
+    if frequency == 100:
+        plot_path = os.path.join(plot_dir, "Station_beam_2D_" + model + ".png")
+    else:
+        plot_path = os.path.join(
+            plot_dir, "Station_beam_2D_" + model + "@" + str(frequency) + ".png"
+        )
     plt.savefig(plot_path)
     plt.close()

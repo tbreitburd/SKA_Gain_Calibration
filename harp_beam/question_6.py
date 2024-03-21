@@ -7,7 +7,6 @@ from harp_beam import compute_EEPs, StEFCal, compute_array_pattern
 from plot_funcs import plot_station_beam_2D
 import scipy.io
 import os
-import matplotlib.pyplot as plt
 import warnings
 
 # Ignore the pcolormesh warning
@@ -30,8 +29,8 @@ y_pos = pos_ant[:, 1]
 # Define the angles over which to get EEPs
 # Here we want to get EEps for theta = [ -pi/2, pi/2] and phi = 0
 # Get EEPs for theta from -pi/2 to pi/2
-theta = np.linspace(0, np.pi / 2, 100)[:, None]
-theta = np.concatenate((-theta[::-1], theta), axis=0)  # to get theta from -pi/2 to pi/2
+theta = np.linspace(0, np.pi / 2, 200)[:, None]
+# theta = np.concatenate((-theta[::-1], theta), axis=0)  # to get theta from -pi/2 to pi/2
 phi = np.linspace(0, 2 * np.pi, 200)[:, None]
 
 theta_EEP = np.concatenate([theta] * 200)
@@ -100,57 +99,38 @@ theta0 = 40 * np.pi / 180
 phi0 = 80 * np.pi / 180
 
 P_true_X = compute_array_pattern(
-    G_true, 2, v_theta_polX, v_phi_polX, x_pos, y_pos, theta, phi, 0, 0, 100
+    G_true, 2, v_theta_polX, v_phi_polX, x_pos, y_pos, theta, phi, theta0, phi0, 100
 )
 
 P_EEPs_X = compute_array_pattern(
-    G_EEPs, 2, v_theta_polX, v_phi_polX, x_pos, y_pos, theta, phi, 0, 0, 100
+    G_EEPs, 2, v_theta_polX, v_phi_polX, x_pos, y_pos, theta, phi, theta0, phi0, 100
 )
 
 P_AEP_X = compute_array_pattern(
-    G_AEP, 2, v_theta_polX, v_phi_polX, x_pos, y_pos, theta, phi, 0, 0, 100
+    G_AEP, 2, v_theta_polX, v_phi_polX, x_pos, y_pos, theta, phi, theta0, phi0, 100
 )
 
 P_true_Y = compute_array_pattern(
-    G_true, 2, v_theta_polY, v_phi_polY, x_pos, y_pos, theta, phi, 0, 0, 100
+    G_true, 2, v_theta_polY, v_phi_polY, x_pos, y_pos, theta, phi, theta0, phi0, 100
 )
 
 P_EEPs_Y = compute_array_pattern(
-    G_EEPs, 2, v_theta_polY, v_phi_polY, x_pos, y_pos, theta, phi, 0, 0, 100
+    G_EEPs, 2, v_theta_polY, v_phi_polY, x_pos, y_pos, theta, phi, theta0, phi0, 100
 )
 
 P_AEP_Y = compute_array_pattern(
-    G_AEP, 2, v_theta_polY, v_phi_polY, x_pos, y_pos, theta, phi, 0, 0, 100
+    G_AEP, 2, v_theta_polY, v_phi_polY, x_pos, y_pos, theta, phi, theta0, phi0, 100
 )
 print("Array patterns computed")
 
-# Get the patterns in dBV
-P_true_X_dB = 20 * np.log10(np.abs(P_true_X))
-P_EEPs_X_dB = 20 * np.log10(np.abs(P_EEPs_X))
-P_AEP_X_dB = 20 * np.log10(np.abs(P_AEP_X))
-P_true_Y_dB = 20 * np.log10(np.abs(P_true_Y))
-P_EEPs_Y_dB = 20 * np.log10(np.abs(P_EEPs_Y))
-P_AEP_Y_dB = 20 * np.log10(np.abs(P_AEP_Y))
 
-
-# Plot the station beam
-plt.figure()
-plt.plot(
-    theta[0, :], P_true_X_dB[0, :], label="True array pattern X feed", color="black"
-)
-plt.plot(
-    theta[0, :],
-    P_EEPs_X_dB[0, :],
-    label="Estimated array pattern X feed using EEPs",
-    color="red",
-    linestyle="--",
-)
-plt.show()
-
+# Combine the feeds
 P_true = np.sqrt(np.abs(P_true_X) ** 2 + np.abs(P_true_Y) ** 2)
 P_AEP = np.sqrt(np.abs(P_AEP_X) ** 2 + np.abs(P_AEP_Y) ** 2)
 P_EEPs = np.sqrt(np.abs(P_EEPs_X) ** 2 + np.abs(P_EEPs_Y) ** 2)
 
+
+# Convert the array patterns to dBV
 P_true_dB = 20 * np.log10(np.abs(P_true))
 P_AEP_dB = 20 * np.log10(np.abs(P_AEP))
 P_EEPs_dB = 20 * np.log10(np.abs(P_EEPs))
@@ -163,6 +143,35 @@ y = np.zeros((200, 200))
 x = np.sin(theta) * np.cos(phi)
 y = np.sin(theta) * np.sin(phi)
 
+# Plot the station beams
+# and an anomaly one
 plot_station_beam_2D(x, y, P_true_dB, 100, "True")
 plot_station_beam_2D(x, y, P_EEPs_dB, 100, "EEPs")
 plot_station_beam_2D(x, y, P_AEP_dB, 100, "AEP")
+plot_station_beam_2D(x, y, P_true_dB - P_EEPs_dB, 100, "True - EEPs")
+
+
+# For the frequency extremes:
+P_EEPs_X = compute_array_pattern(
+    G_EEPs, 2, v_theta_polX, v_phi_polX, x_pos, y_pos, theta, phi, 0, 0, 50
+)
+P_EEPs_Y = compute_array_pattern(
+    G_EEPs, 2, v_theta_polY, v_phi_polY, x_pos, y_pos, theta, phi, 0, 0, 50
+)
+
+
+P_EEPs_50 = np.sqrt(np.abs(P_EEPs_X) ** 2 + np.abs(P_EEPs_Y) ** 2)
+P_EEPs_50_dB = 20 * np.log10(np.abs(P_EEPs_50))
+
+P_EEPs_X = compute_array_pattern(
+    G_EEPs, 2, v_theta_polX, v_phi_polX, x_pos, y_pos, theta, phi, 0, 0, 350
+)
+P_EEPs_Y = compute_array_pattern(
+    G_EEPs, 2, v_theta_polY, v_phi_polY, x_pos, y_pos, theta, phi, 0, 0, 350
+)
+
+P_EEPs_350 = np.sqrt(np.abs(P_EEPs_X) ** 2 + np.abs(P_EEPs_Y) ** 2)
+P_EEPs_350_dB = 20 * np.log10(np.abs(P_EEPs_350))
+
+plot_station_beam_2D(x, y, P_EEPs_50_dB, 50, "EEPs")
+plot_station_beam_2D(x, y, P_EEPs_350_dB, 350, "EEPs")

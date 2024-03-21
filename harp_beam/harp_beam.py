@@ -125,6 +125,7 @@ def compute_EEPs(mat, theta, phi):
     @return np.array (complex double) v_phi_polX
     """
 
+    # Make deep copies of theta and phi to avoid modifying the input
     theta_ = np.copy(theta)
     phi_ = np.copy(phi)
     ind = theta < 0
@@ -242,24 +243,19 @@ def StEFCal(M, R, tau, i_max, P, g_sol):
             # Get the absolute error between the estimated gains and the true gains
 
             if norm_diff / norm_g <= tau:
-                G_new = np.diag(g_new)
-                return G_new, diff, abs_error, amp_diff, phase_diff
+                abs_error.append(np.linalg.norm(np.abs(g_new - g_sol)))
+                amp_diff.append(np.linalg.norm(np.abs(np.abs(g_new) - np.abs(g_sol))))
+                phase_diff.append(
+                    np.linalg.norm(np.abs(np.angle(g_new) - np.angle(g_sol)))
+                )
+                break
             else:
                 g_new = (g_new + g_old) / 2
         g_old = g_new.copy()
 
-        abs_error.append(
-            np.linalg.norm(np.abs(g_new) - np.abs(g_sol))
-            / np.linalg.norm(np.abs(g_new))
-        )
-        amp_diff.append(
-            np.linalg.norm(np.abs(g_new) - np.abs(g_sol))
-            / np.linalg.norm(np.abs(g_new))
-        )
-        phase_diff.append(
-            np.linalg.norm(np.angle(g_new) - np.angle(g_sol))
-            / np.linalg.norm(np.angle(g_new))
-        )
+        abs_error.append(np.linalg.norm(np.abs(g_new - g_sol)))
+        amp_diff.append(np.linalg.norm(np.abs(np.abs(g_new) - np.abs(g_sol))))
+        phase_diff.append(np.linalg.norm(np.abs(np.angle(g_new) - np.angle(g_sol))))
 
     G_new = np.diag(g_new)
     print("Did not converge before max iteration")
