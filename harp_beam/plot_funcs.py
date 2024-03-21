@@ -107,14 +107,14 @@ def plot_station_beam(
         P_EEPs_dB_X,
         label="Estimated array pattern X feed using EEPs",
         color="red",
-        linestyle="dashed",
+        linestyle="--",
     )
     ax[0].plot(
         theta,
         P_AEP_dB_X,
         label="Estimated array pattern X feed using AEP",
         color="green",
-        linestyle="dashdot",
+        linestyle=":",
     )
     ax[0].set_ylabel("Voltage (dBV)")
     ax[0].set_title("Station beam for X feed, frequency = " + str(frequency) + "MHz")
@@ -126,14 +126,14 @@ def plot_station_beam(
         P_EEPs_dB_Y,
         label="Estimated array pattern Y feed using EEPs",
         color="red",
-        linestyle="dashed",
+        linestyle="--",
     )
     ax[1].plot(
         theta,
         P_AEP_dB_Y,
         label="Estimated array pattern Y feed using AEP",
         color="green",
-        linestyle="dashdot",
+        linestyle=":",
     )
     ax[1].set_xlabel("Theta")
     ax[1].set_ylabel("Voltage (dBV)")
@@ -148,5 +148,38 @@ def plot_station_beam(
     if not os.path.exists(plot_dir):
         os.makedirs(plot_dir)
     plot_path = os.path.join(plot_dir, "Station_beam.png")
+    plt.savefig(plot_path)
+    plt.close()
+
+
+def plot_station_beam_2D(x, y, P_dB, frequency, model):
+    """
+    @brief Plot the 2D station beam
+
+    @param x x-coordinate, np.array, float
+    @param y y-coordinate, np.array, float
+    @param P_dB Array pattern, 2 feeds combined, np.array, float
+    @param frequency Frequency, float
+    @param model Gain SOlution Model used, str
+
+    @return Plot of the 2D station beam
+    """
+
+    plt.style.use("ggplot")
+    fig, ax = plt.subplots(1, 1, figsize=(6, 6))
+
+    ax.pcolormesh(x, y, P_dB, shading="auto")
+    ax.set_xlabel("x")
+    ax.set_ylabel("y")
+    ax.set_title("2D Station beam, frequency = " + str(frequency) + "MHz")
+
+    plt.tight_layout()
+
+    # Save the plot
+    project_dir = os.getcwd()
+    plot_dir = os.path.join(project_dir, "Plots")
+    if not os.path.exists(plot_dir):
+        os.makedirs(plot_dir)
+    plot_path = os.path.join(plot_dir, "Station_beam_2D_" + model + ".png")
     plt.savefig(plot_path)
     plt.close()
