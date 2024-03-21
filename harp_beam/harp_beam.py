@@ -241,14 +241,14 @@ def StEFCal(M, R, tau, i_max, P, g_sol):
             norm_g = np.linalg.norm(np.abs(g_new))
             diff.append(norm_diff / norm_g)
             # Get the absolute error between the estimated gains and the true gains
-
             if norm_diff / norm_g <= tau:
                 abs_error.append(np.linalg.norm(np.abs(g_new - g_sol)))
                 amp_diff.append(np.linalg.norm(np.abs(np.abs(g_new) - np.abs(g_sol))))
                 phase_diff.append(
                     np.linalg.norm(np.abs(np.angle(g_new) - np.angle(g_sol)))
                 )
-                break
+                G_new = np.diag(g_new)
+                return G_new, diff, abs_error, amp_diff, phase_diff
             else:
                 g_new = (g_new + g_old) / 2
         g_old = g_new.copy()
