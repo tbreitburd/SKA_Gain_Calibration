@@ -167,9 +167,9 @@ Then comes the visibilities which are the time cross-correlation of the voltage 
     M_{ij,p} = \int\int (\mathbf{F}_{i,p}(\theta, \phi) \cdot \mathbf{F}_{j,p}^{*}(\theta, \phi))T_{b}(\theta, \phi)e^{-j\mathbf{k} \cdot (\mathbf{r_{i}}-\mathbf{r_{j}})} \sin\theta d\theta d\phi
 \end{equation}
 
-Where $\mathbf{F}_{j,p}^{*}(\theta, \phi)$ is the complex conjugate of the EEP of antenna $j$ for feed port $p$, $T_{b}(\theta, \phi)$ is the brightness temperature of the sky, and $\mathbf{r}_{i}$ is the position of antenna i and $\mathbf{k}$ is the wavevector with wavenumber k such that: $\mathbf{k} = k \sin \theta \cos \phi \mathbf{\hat{x}} + k \sin \theta \sin \phi \mathbf{\hat{y}} + k \cos \theta \mathbf{\hat{z}}$. 
+Where $\mathbf{F}_{j,p}^{*}(\theta, \phi)$ is the complex conjugate of the EEP of antenna $j$ for feed port $p$, $T_{b}(\theta, \phi)$ is the brightness temperature of the sky, and $\mathbf{r}_{i}$ is the position of antenna i and $\mathbf{k}$ is the wavevector with wavenumber k such that: $\mathbf{k} = k \sin \theta \cos \phi \mathbf{\hat{x}} + k \sin \theta \sin \phi \mathbf{\hat{y}} + k \cos \theta \mathbf{\hat{z}}$.
 
-By combining visibilities for all feed ports, the measured visibilities can be written as $R_{ij} = R_{ij, X} + R_{ij, Y}$ and the model visibilities: $M_{ij} = M_{ij, X} + M_{ij, Y}$. Thus, equations (1) and (2) can be written in matrix form as: 
+By combining visibilities for all feed ports, the measured visibilities can be written as $R_{ij} = R_{ij, X} + R_{ij, Y}$ and the model visibilities: $M_{ij} = M_{ij, X} + M_{ij, Y}$. Thus, equations (1) and (2) can be written in matrix form as:
 
 \begin{equation}
     \mathbf{R} = \mathbf{G} \mathbf{M} \mathbf{G}^H
@@ -187,7 +187,7 @@ Where $\mathbf{\hat{G}}$ is therefore an estimator of the gain that solves Eq (3
 
 \section{Equation (4) and multiplying all gains by the same phase factor}
 
-Equation (4) summarises the calibration problem. It states that the estimate for the gain solution should minimise the difference between the measured visibilities and the modeled visibilities, with respect to the gains $\mathbf{G_{i}}$. The Frobenius norm is used to measure this difference between the two matrices and can be described as the squareroot of the total squared error. 
+Equation (4) summarises the calibration problem. It states that the estimate for the gain solution should minimise the difference between the measured visibilities and the modeled visibilities, with respect to the gains $\mathbf{G_{i}}$. The Frobenius norm is used to measure this difference between the two matrices and can be described as the squareroot of the total squared error.
 
 Now, from Eq (1) and (2), both the received and modelled visibilities are dependent on the sky being observed. Thus, in the context of calibration, the sky has to be known in order to solve for the gains.
 
@@ -196,6 +196,26 @@ All matrices in Eq. (4) are of size 256$\times$256. The gains matrix is diagonal
 By applying the Hermitian transpose to the gains matrix, it ensures the gains of each antenna is used.
 
 \section{Power of Embedded Element Patterns (EEPs) and the Average Element Pattern (AEP)}
+
+Here, we used the \texttt{compute\_EEP} function given in the starter code to plot the EEPs of the 256 antennae, as well the Average Element Pattern (AEP). Compute EEP description?.
+
+
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\textwidth]{../Plots/EEP_AEP_polX.png}
+    \caption{The EEPs of the 256 antennae.}
+    \label{fig:EEPs}
+\end{figure}
+
+Comments on Variability
+
+
+\section{The StEFCal Algorithm}
+
+Discussion of StEFCal algorithm . It solves system of eq 4 and finds per-antenna gain.
+
+
 
 
 \end{document}
