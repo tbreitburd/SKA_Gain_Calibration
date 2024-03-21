@@ -265,12 +265,13 @@ def StEFCal(M, R, tau, i_max, P, g_sol):
 
 
 def compute_array_pattern(
-    G_sol, v_theta, v_phi, x_pos, y_pos, theta, phi, theta_0, phi_0, frequency
+    G_sol, dim, v_theta, v_phi, x_pos, y_pos, theta, phi, theta_0, phi_0, frequency
 ):
     """
     @brief Compute the array pattern for a given set of EEPs
 
     @param G_sol Exact gain solution, np.array, complex
+    @param dim Dimension of the beam, can be 1 or 2, int
     @param v_theta EEPs for theta, np.array, complex
     @param v_phi EEPs for phi, np.array, complex
     @param x_pos x position of antennas, np.array, float
@@ -292,8 +293,12 @@ def compute_array_pattern(
 
     EEP = np.sqrt(np.abs(v_theta) ** 2 + np.abs(v_phi) ** 2)
 
-    array_pattern = np.zeros((theta.shape[0]), dtype=complex)
-    phase_factor = np.zeros((theta.shape[0]), dtype=complex)
+    if dim == 1:
+        array_pattern = np.zeros((theta.shape[0]), dtype=complex)
+        phase_factor = np.zeros((theta.shape[0]), dtype=complex)
+    else:
+        array_pattern = np.zeros((theta.shape[0], phi.shape[0]), dtype=complex)
+        phase_factor = np.zeros((theta.shape[0], phi.shape[0]), dtype=complex)
 
     for i in range(256):
         w = np.exp(
@@ -309,10 +314,13 @@ def compute_array_pattern(
             * k0
             * (
                 (x_pos[i] * np.sin(theta) * np.cos(phi))
-                + (y_pos[i] * np.sin(theta) * np.cos(phi))
+                + (y_pos[i] * np.sin(theta) * np.sin(phi))
             )
         )
 
-        array_pattern += w * g[i] * EEP[:, i] * phase_factor[:, 0]
+        if dim == 1:
+            array_pattern += w * g[i] * EEP[:, i] * phase_factor[:, 0]
+        else:
+            array_pattern += w * g[i] * EEP[:, :, i] * phase_factor[:, :]
 
     return np.abs(array_pattern)
