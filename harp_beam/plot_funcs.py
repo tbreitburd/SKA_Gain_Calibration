@@ -99,7 +99,7 @@ def plot_station_beam(
     """
 
     plt.style.use("ggplot")
-    fig, ax = plt.subplots(2, 1, figsize=(10, 5))
+    fig, ax = plt.subplots(2, 1, figsize=(6, 10))
 
     ax[0].plot(theta, P_dB_X, label="True array pattern X feed", color="black")
     ax[0].plot(
@@ -107,17 +107,17 @@ def plot_station_beam(
         P_EEPs_dB_X,
         label="Estimated array pattern X feed using EEPs",
         color="red",
+        linestyle="dashed",
     )
     ax[0].plot(
         theta,
         P_AEP_dB_X,
         label="Estimated array pattern X feed using AEP",
-        color="blue",
+        color="green",
+        linestyle="dashdot",
     )
-    ax[0].set_xlabel("Theta")
     ax[0].set_ylabel("Voltage (dBV)")
     ax[0].set_title("Station beam for X feed, frequency = " + str(frequency) + "MHz")
-    ax[0].grid()
     ax[0].legend()
 
     ax[1].plot(theta, P_dB_Y, label="True array pattern Y feed", color="black")
@@ -126,18 +126,21 @@ def plot_station_beam(
         P_EEPs_dB_Y,
         label="Estimated array pattern Y feed using EEPs",
         color="red",
+        linestyle="dashed",
     )
     ax[1].plot(
         theta,
         P_AEP_dB_Y,
         label="Estimated array pattern Y feed using AEP",
-        color="blue",
+        color="green",
+        linestyle="dashdot",
     )
     ax[1].set_xlabel("Theta")
     ax[1].set_ylabel("Voltage (dBV)")
     ax[1].set_title("Station beam for Y feed, frequency = " + str(frequency) + "MHz")
-    ax[1].grid()
     ax[1].legend()
+
+    plt.tight_layout()
 
     # Save the plot
     project_dir = os.getcwd()

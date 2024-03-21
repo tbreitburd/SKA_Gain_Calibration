@@ -213,11 +213,11 @@ def StEFCal(M, R, tau, i_max, P, g_sol):
     @return np.array (float) phase_diff
     """
 
-    G_old = np.identity(256, dtype=complex)
-    G_new = np.identity(256, dtype=complex)
+    g_old = np.ones(P, dtype=complex)
+    g_new = np.ones(P, dtype=complex)
     diff = []
-    g_new = np.array(np.diag(G_new), dtype=complex)
-    g_old = np.array(np.diag(G_old), dtype=complex)
+    # g_new = np.array(np.diag(G_new), dtype = complex)
+    # g_old = np.array(np.diag(G_old), dtype = complex)
 
     abs_error = []
     phase_diff = []
@@ -225,11 +225,10 @@ def StEFCal(M, R, tau, i_max, P, g_sol):
 
     for i in range(0, i_max):
         for p in range(0, P):
+            G_old = np.diag(g_old)
             z = np.dot(G_old, M[:, p])
             g_p = np.dot(np.conjugate(R[:, p]), z) / (np.dot(np.conjugate(z), z))
             g_new[p] = g_p.flatten()[0]
-
-        G_new = np.diag(g_new)
 
         # Check G_new is diagonal
         # if not np.allclose(G_new, np.diag(np.diagonal(G_new))):
@@ -237,16 +236,17 @@ def StEFCal(M, R, tau, i_max, P, g_sol):
 
         # Check if the difference is smaller than tau
         if i % 2 == 0:
-            norm_diff = np.linalg.norm(g_new - g_old, ord=2)
-            norm_g = np.linalg.norm(g_new, ord=2)
+            norm_diff = np.linalg.norm(np.abs(g_new) - np.abs(g_old))
+            norm_g = np.linalg.norm(np.abs(g_new))
             diff.append(norm_diff / norm_g)
             # Get the absolute error between the estimated gains and the true gains
 
             if norm_diff / norm_g <= tau:
-                break
+                G_new = np.diag(g_new)
+                return G_new, diff, abs_error, amp_diff, phase_diff
             else:
-                G_new = (G_new + G_old) / 2
-        G_old = G_new.copy()
+                g_new = (g_new + g_old) / 2
+        g_old = g_new.copy()
 
         abs_error.append(
             np.linalg.norm(np.abs(g_new) - np.abs(g_sol))
@@ -261,6 +261,8 @@ def StEFCal(M, R, tau, i_max, P, g_sol):
             / np.linalg.norm(np.angle(g_new))
         )
 
+    G_new = np.diag(g_new)
+    print("Did not converge before max iteration")
     return G_new, diff, abs_error, amp_diff, phase_diff
 
 
