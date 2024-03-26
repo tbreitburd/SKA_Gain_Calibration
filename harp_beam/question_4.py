@@ -1,7 +1,9 @@
 """!@file question_4.py
-@brief File containing code to answer question 4 of the SKA-low mini project.
 
-@details
+@brief File containing code to run the SteEFCal algorithm for the AEP and EEPs model matrices
+and plot the convergence of the algorithm for the 2 cases. Plotting the absolute error
+of the gain solutions, and of their amplitude and phase difference, as a function of the
+number of iterations.
 
 @author Created by T.Breitburd on 19/03/2024
 """

@@ -1,7 +1,9 @@
 """!@file question_2.py
-@brief File containing code to answer question 2 of the test.
 
-@details
+@brief File containing code to compute the EEPs of the SKA1-Low station
+and plot the EEPs and AEPs
+
+@details This script computes the EEPs of the SKA1-Low station and plots the EEPs and AEPs.
 
 @author Created by T.Breitburd on 19/03/2024
 """
@@ -22,7 +24,7 @@ pos_ant = np.array(SKA_data["pos_ant"])
 x_pos = pos_ant[:, 0]
 y_pos = pos_ant[:, 1]
 
-# Plot the positions of the antennae
+# Plot the positions of the antennae for visualisation
 plot_antennae_positions(x_pos, y_pos)
 
 # Define the angles over which to get EEPs
@@ -44,7 +46,7 @@ v_theta_polY, v_phi_polY, v_theta_polX, v_phi_polX = compute_EEPs(SKA_data, thet
 # Because compute EEPs returns the spherical components of the EEPs,
 # the components need to be combined to get the EEPs
 
-# Combine the EEPs
+# Combine the EEPs components
 v_polX = np.sqrt(np.abs(v_theta_polX) ** 2 + np.abs(v_phi_polX) ** 2)
 v_polY = np.sqrt(np.abs(v_theta_polY) ** 2 + np.abs(v_phi_polY) ** 2)
 

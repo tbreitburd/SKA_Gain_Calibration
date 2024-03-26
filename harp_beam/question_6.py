@@ -1,5 +1,10 @@
-"""!@file question_5.py
+"""!@file question_6.py
 
+@brief File containing code to plot the 2D station beam of the SKA1-Low station
+using the EEPs and AEPs model matrices, and the exact gain solution, pointing in the direction
+theta0 = 40 degrees and phi0 = 80 degrees.
+
+@author Created by T.Breitburd on 19/03/2024
 """
 
 import numpy as np
@@ -36,8 +41,6 @@ phi = np.linspace(0, 2 * np.pi, 200)[:, None]
 theta_EEP = np.concatenate([theta] * 200)
 phi_EEP = np.repeat(phi, 200)
 phi_EEP = phi_EEP.reshape(40000, 1)
-print(theta_EEP.shape)
-print(phi_EEP.shape)
 
 # ----------------
 # Compute the EEPs
@@ -77,7 +80,7 @@ M_EEPs = np.array(mat["M_EEPs"])  # model matrix using all EEPs
 g_sol = np.array(mat["g_sol"]).reshape(256)  # exact gain solution
 G_true = np.diag(g_sol)
 
-# Set the convergence tolerence and maximum number of iterations, and number of antennas
+# Set the convergence tolerance and maximum number of iterations, and number of antennas
 tau = 1e-5
 i_max = 100
 P = 256
@@ -129,12 +132,14 @@ P_true = np.sqrt(np.abs(P_true_X) ** 2 + np.abs(P_true_Y) ** 2)
 P_AEP = np.sqrt(np.abs(P_AEP_X) ** 2 + np.abs(P_AEP_Y) ** 2)
 P_EEPs = np.sqrt(np.abs(P_EEPs_X) ** 2 + np.abs(P_EEPs_Y) ** 2)
 
+# Get the difference between the true and the EEPs
+P_diff = P_true - P_EEPs
 
 # Convert the array patterns to dBV
 P_true_dB = 20 * np.log10(np.abs(P_true))
 P_AEP_dB = 20 * np.log10(np.abs(P_AEP))
 P_EEPs_dB = 20 * np.log10(np.abs(P_EEPs))
-
+P_diff_dB = 20 * np.log10(np.abs(P_diff))
 
 # Define the sine-cosine coordinates
 x = np.zeros((200, 200))
@@ -148,7 +153,7 @@ y = np.sin(theta) * np.sin(phi)
 plot_station_beam_2D(x, y, P_true_dB, 100, "True")
 plot_station_beam_2D(x, y, P_EEPs_dB, 100, "EEPs")
 plot_station_beam_2D(x, y, P_AEP_dB, 100, "AEP")
-plot_station_beam_2D(x, y, P_true_dB - P_EEPs_dB, 100, "True - EEPs")
+plot_station_beam_2D(x, y, P_diff_dB, 100, "True - EEPs")
 
 
 # For the frequency extremes:

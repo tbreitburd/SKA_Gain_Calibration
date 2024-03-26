@@ -1,7 +1,7 @@
 """!@file question_3.py
-@brief File containing code to answer question 3 of the test.
 
-@details
+@brief File containing code to run the SteEFCal algorithm for the AEP and EEPs model matrices
+and plot the convergence of the algorithm for the 2 cases.
 
 @author Created by T.Breitburd on 19/03/2024
 """
@@ -20,7 +20,7 @@ M_AEP = np.array(mat["M_AEP"])  # model matrix using AEP
 M_EEPs = np.array(mat["M_EEPs"])  # model matrix using all EEPs
 g_sol = np.array(mat["g_sol"]).reshape(256)  # exact gain solution
 
-# Set the convergence tolerence and maximum number of iterations, and number of antennas
+# Set the convergence tolerance, maximum number of iterations, and number of antennas
 tau = 1e-5
 i_max = 100
 P = 256

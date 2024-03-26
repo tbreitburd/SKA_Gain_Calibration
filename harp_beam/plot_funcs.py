@@ -3,7 +3,8 @@
 @brief Plotting functions for the calibration of the ska-low station mini-project.
 
 @details This module contains functions to plot the EEPs and AEPs,
-and the convergence of the SteEFCal algorithm.
+the convergence of the SteEFCal algorithm, the positions of the antennae,
+the station beam and the 2D station beam.
 
 @author Created by T.Breitburd on 19/03/2024
 """
@@ -21,6 +22,8 @@ def plot_antennae_positions(x_pos, y_pos):
 
     @return Plot of the positions of the antennae.
     """
+
+    # Plot the positions of the antennae
     plt.style.use("ggplot")
 
     plt.scatter(x_pos, y_pos, marker="x", color="grey")
@@ -50,11 +53,13 @@ def plot_EEP_AEP(theta, EEP, pol):
 
     @return Plot of the EEPs and AEPs for a given polarization.
     """
+
+    # Plot the EEPs and AEPs
     for i in range(EEP.shape[1]):
         plt.plot(
             theta, EEP[:, i], color="grey", alpha=0.5, label="EEP's" if i == 0 else ""
         )
-
+    # Plot the AEP, by taking the mean of the EEPs
     plt.plot(theta, np.mean(EEP, axis=1), label="AEP", color="black")
     plt.xlabel("Theta (radians)")
     plt.ylabel("E-field (dBV)")
@@ -75,15 +80,17 @@ def plot_EEP_AEP(theta, EEP, pol):
 
 def plot_convergence(errors, iteration_number, model, error_type):
     """
-    @brief Plot the convergence of the SteEFCal algorithm.
+    @brief Plot the convergence of the StEFCal algorithm.
 
-    @param errors Absolute errors of the gain solutions, np.array, float
+    @param errors Absolute errors (gain difference, absolute, amplitude or phase)
+    of the gain solutions, np.array, float
     @param iteration_number Number of iterations, int
     @param error_name Name of the error, str
 
     @return Plot of the absolute errors of the gain solutions vs the iteration number.
     """
 
+    # Plot the convergence of the StEFCal algorithm
     plt.figure(figsize=(4, 4))
     plt.plot(errors[:iteration_number])
     plt.xlabel("Iteration")
@@ -199,10 +206,13 @@ def plot_station_beam_2D(x, y, P_dB, frequency, model):
     plt.style.use("ggplot")
     fig, ax = plt.subplots(1, 1, figsize=(6, 6))
 
-    p_min, p_max = np.min(P_dB), np.max(P_dB)
+    # Plot the 2D station beam
 
+    # Define a colorbar
+    p_min, p_max = np.min(P_dB), np.max(P_dB)
     c = ax.pcolormesh(x, y, P_dB, vmin=p_min, vmax=p_max, shading="auto")
     fig.colorbar(c, ax=ax)
+
     ax.set_xlabel("x")
     ax.set_ylabel("y")
     ax.set_title(model + " 2D Station beam, frequency = " + str(frequency) + "MHz")

@@ -1,5 +1,13 @@
 """!@file question_5.py
 
+@brief File containing code to plot the station beam of the SKA1-Low station
+using the EEPs and AEPs model matrices, and the exact gain solution.
+
+@details This script computes the EEPs of the SKA1-Low station, runs the SteEFCal algorithm
+for the AEP and EEPs model matrices, and plots the station beam of the SKA1-Low station using
+the EEPs and AEPs model matrices, and the exact gain solution.
+
+@author Created by T.Breitburd on 19/03/2024
 """
 
 import numpy as np
