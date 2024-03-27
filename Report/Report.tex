@@ -150,7 +150,7 @@
 
 \section{Introduction}
 
-In this mini project, an algorithm for the retrieval of gain solutions for a single SKA-low station is implemented. One SKA1-low station comprises 256 antennae that cover a frequency range of 50-350 MHz. The gain retrieval algorithm is used in order to calibrate the stations, to account for known instrumental effects which occur in the analog chain: Low-Noise Amplifiers (LNA), cables, and other analog components. Because it can be summarised into a series of linear transformations of the input signal, the gain calibration can be done with a single complex-valued gain for each antenna.
+In this mini project, an algorithm for the retrieval of gain solutions for a single SKA-low station is implemented. One SKA1-low station comprises 256 antennae that cover a frequency range of 50-350 MHz. The gain retrieval algorithm is used in order to calibrate the stations, to account for known instrumental effects which occur in the analog chain: Low-Noise Amplifiers (LNA), cables, and other analog components\cite{borg2020on-sky}. Because it can be summarised into a series of linear transformations of the input signal, the gain calibration can be done with a single complex-valued gain for each antenna.
 
 \section{Calibration Problem}
 
@@ -160,9 +160,9 @@ In this short section, equations defining the problem of calibration are listed.
     v_{i, p} = G_{i} \mathbf{F}_{i,p}(\theta, \phi) \cdot \mathbf{E}(\theta, \phi)
 \end{equation}
 
-where $\theta$ and $\phi$ are the zenith and azimuth angle, respectively. $\mathbf{E}$ is the incident electric field from the sky. $\mathbf{F}_{i,p}$ is the Embedded Element Pattern (EEP) of antenna $i$ for feed port $p$. And finally, $G_{i}$ is the complex gain for antenna $i$.
+where $\theta$ and $\phi$ are the zenith and azimuth angle, respectively. $\mathbf{E}$ is the incident electric field from the sky. $\mathbf{F}_{i,p}$ is the Embedded Element Pattern (EEP) of antenna $i$ for feed port $p$. The feed ports are a result of the array antennae having two feeds, which are the cables or conductors that connect the antenna to the receivers\cite{smirnov2011revisiting}\cite{antenna_feed}. And finally, $G_{i}$ is the complex gain for antenna $i$.
 
-Then comes the visibilities which are the time cross-correlation of the voltage signals from two antennae, $i$ and $j$, and feed port $p$. There are the measured visibilities $R_{ij,p}$ which can be modeled as $R_{ij,p} = G_{i}G^{*}_{j}M_{ij,p}$ where $M_{ij,p}$ are model visibilities and they are given by:
+Then comes the visibilities which are the time cross-correlation of the voltage signals from two antennae, $i$ and $j$, and feed port $p$\cite{smirnov2011revisiting}. There are the measured visibilities $R_{ij,p}$ which can be modeled as $R_{ij,p} = G_{i}G^{*}_{j}M_{ij,p}$ where $M_{ij,p}$ are model visibilities and they are given by:
 
 \begin{equation}
     M_{ij,p} = \int\int (\mathbf{F}_{i,p}(\theta, \phi) \cdot \mathbf{F}_{j,p}^{*}(\theta, \phi))T_{b}(\theta, \phi)e^{-j\mathbf{k} \cdot (\mathbf{r_{i}}-\mathbf{r_{j}})} \sin\theta d\theta d\phi
@@ -197,9 +197,10 @@ Equation (4) summarises the calibration problem. It states that the estimate for
 for any matrix A of size m$\times$n.
 
 
-For the SKA-Low station, all matrices in Eq. (4) are of size 256$\times$256. The gains matrix is diagonal, with diagonal elements being $G_{i}$, the gain for each antenna $i$. Measured and modelled visibilities matrices $R$ \& $M$ are complex valued, and symmetric. This is because the cross-correlation of two antennae should be undirected: $R_{ij} = R_{ji}$, and the same goes for $M$. As discussed above, the model visibilities are calculated using the EEPs of the antennae, and the brightness temperature of the sky. By applying the Hermitian transpose to the gains matrix, it ensures the gains of each antenna in the concerned pair are used.
+For the SKA-Low station, all matrices in Eq. (4) are of size 256$\times$256\cite{borg2020on-sky}. The gains matrix is diagonal, with diagonal elements being $G_{i}$, the gain for each antenna $i$\cite{smirnov2011revisiting}. Measured and modelled visibilities matrices $R$ \& $M$ are complex valued, and symmetric. This is because the cross-correlation of two antennae should be undirected: $R_{ij} = R_{ji}$, and the same goes for $M$. As discussed above, the model visibilities are calculated using the EEPs of the antennae, and the brightness temperature of the sky. By applying the Hermitian transpose to the gains matrix, it ensures the gains of each antenna in the concerned pair are used, as the transpose will flip the order of the diagonal elements of the matrix.
 
-Considering the residual errors as what is being minimised in Eq.(4), and multiplyin all gains by the same phase factor, $e^{j\phi}$, the following can be shown by considering a single pair of antennae, $i$ and $j$ \cite{complex_conjugates}:
+
+Considering the residual errors as what is being minimised in Eq.(4), and multiplying all gains by the same phase factor, $e^{j\phi}$, the following can be shown by considering a single pair of antennae, $i$ and $j$ \cite{complex_conjugates}:
 
 \begin{equation}
   R_{ij} - e^{j\phi}G_{i}M_{ij}(e^{j\phi}G_{j})^{*} = R_{ij} -  e^{j\phi}G_{i}M_{ij}(e^{j\phi})^{*}G_{j}^{*}
@@ -213,7 +214,7 @@ which ends up being the same as without multiplying by the phase factor. Therefo
 
 \section{Power of Embedded Element Patterns (EEPs) and the Average Element Pattern (AEP)}
 
-The EEPs are a way to account for the impact of antennas being closed to each other, and therefore the mutual coupling that occurs in arrays of antennae\cite{borg2020on-sky}\cite{antenna_theory}. By considering antenna $i$ to be the only active antenna and the others passive, one obtains a representation of the electric field generated by that antenna and affected by the surrounding ones. Here, the \texttt{compute\_EEP} function given in the starter code was used to plot the EEPs of the 256 antennae, as well the Average Element Pattern (AEP). The \texttt{compute\_EEP} function takes in station characteristics data such as the position of the antennae and coefficients for each feed (X and Y), as well as arrays of values of $\theta$ and $\phi$ for which the EEPs need to be computed. It then returns $\theta$ and $\phi$ components of the EEPs for each antenna, each feed, and of course each angular coordinates given. Thus, 4 arrays of number of ($\theta,\phi$) pairs$\times$256 EEP values are obtained. One important note is that \texttt{compute\_EEP} will use $\theta$ and $\phi$ values as angular coordinates, in the order they are given in the arrays, and will not compute EEPs for each possible combination of $\theta$ and $\phi$ values in the arrays.
+The EEPs are a way to account for the impact of antennas being closed to each other, and therefore the mutual coupling that occurs in arrays of antennae\cite{borg2020on-sky}\cite{antenna_theory}. By considering antenna $i$ to be the only active antenna and the others passive, one obtains a representation of the electric field generated by that antenna and affected by the surrounding ones\cite{borg2020on-sky}. Here, the \texttt{compute\_EEP} function given in the starter code was used to plot the EEPs of the 256 antennae, as well the Average Element Pattern (AEP), which is obtained by taking the average of all EEPs. The \texttt{compute\_EEP} function takes in station characteristics data such as the position of the antennae and coefficients for each feed (X and Y), as well as arrays of values of $\theta$ and $\phi$ for which the EEPs need to be computed. It then returns $\theta$ and $\phi$ components of the EEPs for each antenna, each feed, and of course each angular coordinates given. Thus, 4 arrays of number of ($\theta,\phi$) pairs$\times$256 EEP values are obtained. One important note is that \texttt{compute\_EEP} will use $\theta$ and $\phi$ values as angular coordinates, in the order they are given in the arrays, and will not compute EEPs for each possible combination of $\theta$ and $\phi$ values in the arrays.
 
 \begin{figure}[h]
     \centering
@@ -230,7 +231,7 @@ The EEPs are a way to account for the impact of antennas being closed to each ot
 \end{figure}
 
 
-Fig \ref*{fig:EEPs1} and \ref{fig:EEPs2} show the EEPs obtained for $\phi = 0\degree$ and $\theta = [-\pi/2, \pi/2]$ of the 256 antennae for both feed X and Y. The AEP is also shown in black and was simply obtained by averaging the EEPs. As can be seen, there is quite a lot of variability in the EEPs, especially for the X feed, where some have side peaks for large values of $|\theta|$, and others have very low EEP values for these $\theta$ ranges. This could be explained by some antennae being at the edges of the array while others are at the center, surrounded by reflecting antennae (see Fig. \ref{fig:station}).
+Fig \ref{fig:EEPs1} and \ref{fig:EEPs2} show the EEPs obtained for $\phi = 0\degree$ and $\theta = [-\pi/2, \pi/2]$ of the 256 antennae for both feed X and Y. The AEP is also shown in black and was simply obtained by averaging the EEPs. As can be seen, there is quite a lot of variability in the EEPs, especially for the X feed, where some have side peaks for large values of $|\theta|$, and others have very low EEP values for these $\theta$ ranges. This could be explained by some antennae being at the edges of the array while others are at the center, surrounded by reflecting antennae (see Fig. \ref{fig:station}).
 
 \begin{figure}[h]
     \centering
@@ -241,7 +242,7 @@ Fig \ref*{fig:EEPs1} and \ref{fig:EEPs2} show the EEPs obtained for $\phi = 0\de
 
 \section{The StEFCal Algorithm}
 
-In this section the Stastistically Efficient and Fast Calibration (StEFCal) algorithm is implemented and discussed\cite{salvini2014fast}. The StEFCal algorithm is an attempt to solve the calibration problem in Eq. (4) by using an Alternating Direction Implicit (ADI) method, which is often used to solve large matrix equations or partial differential equations\cite{adi_method}. It is a two-step algorithm, that first solves for $G^{H}$, with $G$ fixed, and then solves for $G$, with $G^{H}$ fixed\cite{salvini2014fast}. With some algebra, Salvini \& Wijnholds show that the each iteration is the same as updating each gain value by one that solves a linear least squares problem of the form:
+In this section the Stastistically Efficient and Fast Calibration (StEFCal) algorithm is implemented and discussed\cite{salvini2014fast}. The StEFCal algorithm is an attempt to solve the calibration problem in Eq. (4) by using an Alternating Direction Implicit (ADI) method, which is often used to solve large matrix equations or partial differential equations\cite{adi_method}. It is a two-step algorithm, that first solves for $G^{H}$, with $G$ fixed, and then solves for $G$, with $G^{H}$ fixed\cite{salvini2014fast}. With some algebra, Salvini \& Wijnholds show that each iteration is the same as updating each gain value by one that solves a linear least squares problem of the form:
 
 \begin{equation}
     ||\mathbf{\Delta}||_{F} = ||\mathbf{\hat{R}} - \mathbf{Z}\mathbf{G}^{H}||_{F} = \sqrt{\sum_{p=1}^{P} ||\mathbf{\hat{R}_{:,p}} - \mathbf{Z_{:,p}}g^{*}_{p}||^{2}_{2}}
@@ -253,7 +254,7 @@ where $\mathbf{Z}$ is given by $\mathbf{Z} = \mathbf{G^{[i]}}\mathbf{M}$, with $
     g^{*}_{p} = \frac{\mathbf{\hat{R}_{:,p}} \cdot \mathbf{Z_{:,p}}^{[i - 1]}}{(\mathbf{Z_{:,p}}^{[i - 1]})^{H} \cdot \mathbf{Z_{:,p}}^{[i - 1]}}
 \end{equation}
 
-And this can then be iteratively determined whithin a $p$ loop giving the algorithm:
+And this can then be iteratively determined whithin a antennae, $p$, loop giving the algorithm:
 
 \begin{definitionbox}{StEFCal Algorithm}
   \begin{algorithmic}[1]
@@ -293,7 +294,7 @@ The StEFCal algorithm was implemented, setting the $\tau$ threshold at $10^{-5}$
 \end{figure}
 
 \newpage
-Both show very fast convergence, though the EEPs model visibilities converge almost twice as fast as the AEP model visibilities. Bear in mind that those differences between iteration were obtained every even iteration, so the total iteration number is twice the ones shown in the plots. The total number of iterations until convergence were 26 for the EEPs model and 44 for the AEP model. This is likely due to the AEP being quite a strong assumption, with all EEPs being the same average value. Taking the EEPs case, we can also look at the logarithm of the difference between 2 iterations of $\mathbf{g}$. This is shown in Fig. \ref{fig:log_convergence_EEP} which can be compared to Fig. 14 of the paper\cite{salvini2014fast}. The plot shows that the algorithm converges very quickly, with the error decreasing exponentially with the number of iterations.
+Both show very fast convergence, though the EEPs model visibilities converge almost twice as fast as the AEP model visibilities. Bear in mind that those differences between iteration were obtained every even iteration, so the total iteration number is twice the ones shown in the plots. The total number of iterations until convergence were 27 for the EEPs model and 45 for the AEP model. This is likely due to the AEP being quite a strong assumption, with all EEPs being the same average value. Taking the EEPs case, we can also look at the logarithm of the difference between 2 iterations of $\mathbf{g}$. This is shown in Fig. \ref{fig:log_convergence_EEP} which can be compared to Fig. 14 of the paper\cite{salvini2014fast}. The plot shows that the algorithm converges very quickly, with the error decreasing logarithmically with the number of iterations.
 
 
 \begin{figure}[h]
@@ -322,7 +323,7 @@ where $\mathbf{g_{\text{true}}}$ is the true gains matrix, and the subscript $i$
     \sigma_{\text{phase}} = \sum_{i = 1}^{P = 256}|\mathbf{g}^{i}_{\text{phase}} - \mathbf{g_{\text{true}}}^{i}_{\text{phase}}|
 \end{equation}
 
-with the $i$ as superscript for clarity. Plotting these for both model visibilities, the results are shown in Fig. \ref{fig:abs_error_AEP} for the AEP model, and in Fig. \ref{fig:abs_error_EEP} for the EEPs model.
+with the $i$ switched to superscript for clarity. Plotting these for both model visibilities, the results are shown in Fig. \ref{fig:abs_error_AEP} for the AEP model, and in Fig. \ref{fig:abs_error_EEP} for the EEPs model.
 
 \begin{figure}[h]
     \centering
@@ -344,11 +345,11 @@ with the $i$ as superscript for clarity. Plotting these for both model visibilit
 
 Both show an interesting result in the absolute error as this one, for the first iteration, actually gets worse before decreasing very fast. And though both models converged, the absolute errors of the gain solution, their amplitude, and their phase still have non-negligible values at convergence. However, one can argue that for the sum of 256 errors, these are still reasonable, and this will be further discussed in the next sections.
 
-The minimum absolute error achieved using both models is 12.02 for the AEP model and 11.90 for the EEP model. Which again is consistent with our assumptions based on the relaxation the AEP model provides. Both these errors were obtained for the last iteration, 43 (EEPs) and 25 (AEPs) respectively, which were the penultimate iterations before the algorithm stops due to convergence.
+The minimum absolute error achieved using both models is 12.02 for the AEP model and 11.90 for the EEP model. Which again is consistent with our assumptions based on the relaxation the AEP model provides. Both these errors were obtained for the last iteration, 44 (AEP) and 26 (EEPs) respectively, which were the penultimate iterations before the algorithm stops due to convergence.
 
 \section{Comparing station beams obtained}
 
-In this section, using the best gain solutions obtained from the StEFCal algorithm for both models, the station beams for the X and Y feeds were computed. Similar to section 2, only a slice of the station beam was obtained for $\phi = 0$ and $\theta = [-\pi/2, \pi/2]$. At this point, gain solution estimates have been obtained and the EEP of each antenna has been computed. To compute the total array beam voltage, for a direction ($\theta, \phi$), is given by:
+In this section, using the best gain solutions obtained from the StEFCal algorithm for both models, the station beams for the X and Y feeds were computed. Similar to section 2, only a slice of the station beam was obtained for $\phi = 0$ and $\theta = [-\pi/2, \pi/2]$. At this point, gain solution estimates have been obtained and the EEP of each antenna has been computed. To compute the total array beam voltage, for a direction ($\theta, \phi$), the following equation is used:
 
 \begin{equation}
     \vec{\mathbf{P}}(\theta, \phi) = \sum_{p = 1}^{P = 256} \hat{w_{p}} G_{p} \vec{\mathbf{F}}_{p}(\theta, \phi) e^{-ik(\sin(\theta)\cos(\phi)x_{p} + \sin(\theta)\sin(\phi)y_{p}}
@@ -363,7 +364,7 @@ $G_{p}$ is the gain of the $p$-th antenna, $\vec{\mathbf{F}}_{p}(\theta, \phi)$ 
 
 
 
-\ref{fig:station_beam_AEP} shows the overlapped station beams for the true and modelled gain solutions. The beams are quite similar with the EEPs beam being close to perfectly overlapping the true gain beam. The AEP beam is however slightly off, especially for large positive values of $\theta$. This can again be explained with how big of an assumption the AEP model is as one moves towards the edge of the array and large values of $\theta$ are reached.
+Figure \ref{fig:station_beam_AEP} shows the overlapped station beams for the true and modelled gain solutions. The beams are quite similar with the EEPs beam being close to perfectly overlapping the true gain beam. The AEP beam is however slightly off, especially for large positive values of $\theta$. This can again be explained with how big of an assumption the AEP model is as one moves towards the edge of the array and large values of $\theta$ are reached. These locations are where the EEPs are the most different from the AEP (see Fig. \ref{fig:EEPs1}-\ref{fig:EEPs2}), and therefore the beam is the most different from the true beam.
 
 Coming back to minimum absolute error achieved for the gain values in section 4, it can be seen here that though the errors were not negligible, the beams obtained are still very close to the true beam, for the EEP model. This is both an indication that the StEFCal algorithm works well, and that the EEP model is usually a better option to use for calibration.
 
@@ -387,7 +388,7 @@ In this section, the total array beam is visualised in 2D, for the most accurate
     \label{fig:2D_beam_EEP}
 \end{figure}
 
-As expected, the main lobe of the beam is steered away from the zenith. And though this plot is in sine-cosine coordinates, it is clear to see that $\phi$ is arount $80^{\circ}$, with $90^{\circ}$ being at the top of the plot. Comparing Fig \ref{fig:2D_beam_EEP} to the true gain beam (see Fig. \ref{fig:2D_beam_true_diff}, left), the 2D beam is again very similar. Plotting the difference of the two beams, the result is shown in Fig. \ref{fig:2D_beam_true_diff}, right. The difference is very small, with the overall difference very close to zero, except for a few singular directions.
+As expected, the main lobe of the beam is steered away from the zenith. And though this plot is in sine-cosine coordinates, it is clear to see that $\phi$ is arount $80^{\circ}$, with $90^{\circ}$ being at the top of the plot. Comparing Fig \ref{fig:2D_beam_EEP} to the true gain beam (see Fig. \ref{fig:2D_beam_true_diff}, left), the 2D beam is again very similar. Plotting the difference of the two beams, the result is shown in Fig. \ref{fig:2D_beam_true_diff}, right. The difference is very small, with the overall difference staying below $0$ dBV, or simply small values, except for a few singular directions.
 
 \begin{figure}[h]
     \centering
@@ -397,7 +398,7 @@ As expected, the main lobe of the beam is steered away from the zenith. And thou
     \label{fig:2D_beam_true_diff}
 \end{figure}
 
-Now, these results were obtained for a frequency of 100 MHz. It is worth seeing what different frequencies mean in terms of the beam generated. This was done for the 2 extremes of the SKA-Low station frequency range, 50 MHz and 350 MHz. The results are shown in Fig. \ref{fig:2D_beam_freqs}. As can be seen, the higher the frequency, the narrower the lobes of the beam. This is due to the fact that the higher the frequency, the smaller the wavelength, and therefore the phase factor in the beam calculations is much more sensitive to the value of the angles.
+Now, these results were obtained for a frequency of 100 MHz. It is worth seeing what different frequencies mean in terms of the beam generated. This was done for the 2 extremes of the SKA-Low station frequency range, 50 MHz and 350 MHz. The results are shown in Fig. \ref{fig:2D_beam_freqs}. As can be seen, the higher the frequency, the narrower the lobes of the beam. This is due to the fact that the higher the frequency, the higher the wavenumber, and therefore the phase factor in the beam calculations is much more sensitive to the value of the angles.
 
 \begin{figure}[h]
     \centering
@@ -406,6 +407,67 @@ Now, these results were obtained for a frequency of 100 MHz. It is worth seeing 
     \caption{The 2D total array beam for the EEPs gain solution at 50 MHz (left) and 350 MHz (right).}
     \label{fig:2D_beam_freqs}
 \end{figure}
+
+
+\chapter{Appendix}
+
+\section{README}
+
+\subsection{SKA Coursework - Gain Calibration of a SKA-low Station}
+
+\subsubsection{Description}
+This reporsitory contains the code and written report for the SKA Coursework. The aim was to gain calibrate one SKA-low station using an algorithm for the retrieval of gain solutions.
+
+\subsubsection{Contents}
+
+Inside this \texttt{tmb76/} directory, there are a few sub-directories one can explore. There's the code directory (\texttt{harp\_beam/}), which contains all the code used in the solver. An important note is that the code will give outputs in the command line but also store the plots in a \texttt{Plots/} directory which will be created as the first code file is run. So if there is no \texttt{Plots/} directory in the repository yet, running one of the \texttt{question\_*.py} once should lead to creating one. Then, there is a \texttt{test/} directory which contains some unit test for the code. The last one is the \texttt{Report/} directory, which contains the LaTeX file for the report, as well as the pdf version of it, along with the references \texttt{.bib} file.
+More importantly, there are an \texttt{environment.yml} and \texttt{Dockerfile} files, which one is advised to use.
+
+\subsubsection{How to run the code}
+
+For permissions reasons, the \texttt{Dockerfile} is not set up to pull the repository directly as it builds the image. Therefore, one must first download this repository to their local machine and then are free to build the Docker image from the \texttt{Dockerfile}.
+
+To run the solver on a Docker container, one first has to build the image and run the container. This can be done as follows:
+
+\begin{lstlisting}[language=bash, caption={Building the Docker image and running the container.}]
+$ docker build -t ska_coursework .
+$ docker run --rm -ti ska_coursework
+\end{lstlisting}
+
+The \texttt{ska\_coursework} is not a strict instruction, it can be set to any other name the user may prefer.
+
+As you run this, the Docker image will get built and the container ran, providing the user with a bash terminal-like interface where the solver code can be run as follows:
+
+\begin{lstlisting}[language=bash, caption={Running the code.}]
+  $ python harp_beam/question_*.py
+\end{lstlisting}
+
+where \texttt{*} can be from \texttt{2} to \texttt{6}. Each contain the code to get the results for questions 2 to 6 of the mini-project.
+
+If there is a need to get the plots back on the local machine, the second line above can be ran without the \texttt{--rm} and also set the container name using \texttt{--name=container\_name} (any valid name is fine). From there, run all the code as instructed below. Once all desired outputs and plots have been obtained. One can exit the container and then run:
+
+
+\begin{lstlisting}[language=bash, caption={Copying the plots back to the local machine.}]
+$ docker cp docker cp container_name:/SKA_Coursework/Plots ./Plots
+\end{lstlisting}
+
+The \texttt{Plots/} directory will get copied into the local folder the container was ran from.
+
+Note on time: Running the \texttt{question\_[2-5].py} files all take only a few seconds. Running the \texttt{question\_6.py} file however can take up to a minute. This is based on running all of these on a MacBook Air M2 (2022, Ventura 13.2.1), with 8 GB of Memory, so this may be slower on a container.
+
+
+\subsubsection{Further development}
+
+If one wishes to further develop this code, such as trying other gain self-calibration algorithms, when the image is built, git is installed and initialized and the pre-commit hooks are installed.
+
+\subsubsection{Use of Generative AI}
+
+GitHub Copilot's autocompletion feature was used in coding the project, when writing docstrings for the functions, though sometimes adding elements ourselves, and for repetitive parts of the code, such as question 6 with the multiple \texttt{compute\_array\_pattern()} function calls. It was used to generate code to suppress the user warnings in question 6.
+ChatGPT was also used to help in debugging the code, by providing the traceback as a prompt when an error was difficult to understand, asking to explain what the error refers to. One example is when dealing with the \texttt{np.diag()} function, which was proposed by ChatGPT, when asked how one could extract the diagonal elements of a square array. The vectors defined with it were immutable through some authorization problem. ChatGPT did identify that the np.diag() was the cause. However, the fix proposed which was to write \texttt{g\_new.setflags(write=1)} was not used. And the choice was made to simply try and limit switching between matrix form and vector form in the StEFCal algorithm.
+
+
+
+
 
 \bibliographystyle{plain}
 \bibliography{refs.bib}
