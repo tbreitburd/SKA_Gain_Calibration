@@ -232,8 +232,9 @@ def StEFCal(M, R, tau, i_max, P, g_sol):
             g_new[p] = g_p.flatten()[0]
 
         # Check G_new is diagonal
-        # if not np.allclose(G_new, np.diag(np.diagonal(G_new))):
-        #    raise ValueError('G_new is not diagonal')
+        G_new = np.diag(g_new)
+        if not np.allclose(G_new, np.diag(np.diagonal(G_new))):
+            raise ValueError("G_new is not diagonal")
 
         # Check if the difference is smaller than tau
         if i % 2 == 0:
@@ -286,6 +287,10 @@ def compute_array_pattern(
     freq = frequency * (10**6)  # frequency
     c0 = 299792458  # speed of light
     k0 = 2 * np.pi / (c0 / freq)  # wavenumber
+
+    # Check if the gain solution is diagonal
+    if not np.allclose(G_sol, np.diag(np.diagonal(G_sol))):
+        raise ValueError("G_sol is not diagonal")
 
     g = np.diag(G_sol)
 
