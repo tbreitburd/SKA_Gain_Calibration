@@ -304,6 +304,8 @@ Both show very fast convergence, though the EEPs model visibilities converge alm
   \label{fig:log_convergence_EEP}
 \end{figure}
 
+Proposed in the Salvini paper \cite{salvini2014fast} is a 2nd version of the StEFCal algorithm in which the updated gain values are immediately used in calculating the next updated gain values. They report faster convergence with this version, though they have not provided a formal proof of convergence for this algorithm. Future work could attempt to implement this version, therefore optimising the algorithm for the number of iterations, which could be useful in a real-time calibration scenario for a large array of antennae.
+
 \newpage
 \section{A discussion of the absolute errors between the estimated gains and the true gains}
 
