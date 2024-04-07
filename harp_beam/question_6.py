@@ -8,7 +8,7 @@ theta0 = 40 degrees and phi0 = 80 degrees.
 """
 
 import numpy as np
-from harp_beam import compute_EEPs, StEFCal, compute_array_pattern
+from harp_beam import compute_EEPs, StEFCal, StEFCal_2, compute_array_pattern
 from plot_funcs import plot_station_beam_2D
 import scipy.io
 import os
@@ -93,6 +93,16 @@ G_AEP, diff_AEP, abs_error_AEP, amp_diff_AEP, phase_diff_AEP = StEFCal(
 G_EEPs, diff_EEPs, abs_error_EEPs, amp_diff_EEPs, phase_diff_EEPs = StEFCal(
     M_EEPs, R, tau, i_max, P, g_sol
 )
+
+# Repeat for StEFCaL_2
+G_AEP_2, diff_AEP_2, abs_error_AEP_2, amp_diff_AEP_2, phase_diff_AEP_2 = StEFCal_2(
+    M_AEP, R, tau, i_max, P, g_sol
+)
+
+G_EEPs_2, diff_EEPs_2, abs_error_EEPs_2, amp_diff_EEPs_2, phase_diff_EEPs_2 = StEFCal_2(
+    M_EEPs, R, tau, i_max, P, g_sol
+)
+
 print("StEFCal done")
 # ----------------------------------------------
 # Get the array pattern to plot the station beam
@@ -124,6 +134,25 @@ P_EEPs_Y = compute_array_pattern(
 P_AEP_Y = compute_array_pattern(
     G_AEP, 2, v_theta_polY, v_phi_polY, x_pos, y_pos, theta, phi, theta0, phi0, 100
 )
+
+# Repeat for StEFCal_2
+P_AEP_X_2 = compute_array_pattern(
+    G_AEP_2, 2, v_theta_polX, v_phi_polX, x_pos, y_pos, theta, phi, theta0, phi0, 100
+)
+
+P_EEPs_X_2 = compute_array_pattern(
+    G_EEPs_2, 2, v_theta_polX, v_phi_polX, x_pos, y_pos, theta, phi, theta0, phi0, 100
+)
+
+P_AEP_Y_2 = compute_array_pattern(
+    G_AEP_2, 2, v_theta_polY, v_phi_polY, x_pos, y_pos, theta, phi, theta0, phi0, 100
+)
+
+P_EEPs_Y_2 = compute_array_pattern(
+    G_EEPs_2, 2, v_theta_polY, v_phi_polY, x_pos, y_pos, theta, phi, theta0, phi0, 100
+)
+
+
 print("Array patterns computed")
 
 
@@ -132,14 +161,22 @@ P_true = np.sqrt(np.abs(P_true_X) ** 2 + np.abs(P_true_Y) ** 2)
 P_AEP = np.sqrt(np.abs(P_AEP_X) ** 2 + np.abs(P_AEP_Y) ** 2)
 P_EEPs = np.sqrt(np.abs(P_EEPs_X) ** 2 + np.abs(P_EEPs_Y) ** 2)
 
+P_AEP_2 = np.sqrt(np.abs(P_AEP_X_2) ** 2 + np.abs(P_AEP_Y_2) ** 2)
+P_EEPs_2 = np.sqrt(np.abs(P_EEPs_X_2) ** 2 + np.abs(P_EEPs_Y_2) ** 2)
+
 # Get the difference between the true and the EEPs
 P_diff = P_true - P_EEPs
+P_diff_2 = P_true - P_EEPs_2
 
 # Convert the array patterns to dBV
 P_true_dB = 20 * np.log10(np.abs(P_true))
 P_AEP_dB = 20 * np.log10(np.abs(P_AEP))
 P_EEPs_dB = 20 * np.log10(np.abs(P_EEPs))
 P_diff_dB = 20 * np.log10(np.abs(P_diff))
+
+P_AEP_dB_2 = 20 * np.log10(np.abs(P_AEP_2))
+P_EEPs_dB_2 = 20 * np.log10(np.abs(P_EEPs_2))
+P_diff_dB_2 = 20 * np.log10(np.abs(P_diff_2))
 
 # Define the sine-cosine coordinates
 x = np.zeros((200, 200))
@@ -153,7 +190,11 @@ y = np.sin(theta) * np.sin(phi)
 plot_station_beam_2D(x, y, P_true_dB, 100, "True")
 plot_station_beam_2D(x, y, P_EEPs_dB, 100, "EEPs")
 plot_station_beam_2D(x, y, P_AEP_dB, 100, "AEP")
-plot_station_beam_2D(x, y, P_diff_dB, 100, "True - EEPs")
+plot_station_beam_2D(x, y, P_diff_dB, 100, "True_EEPs")
+
+plot_station_beam_2D(x, y, P_EEPs_dB_2, 100, "EEPs_2")
+plot_station_beam_2D(x, y, P_AEP_dB_2, 100, "AEP_2")
+plot_station_beam_2D(x, y, P_diff_dB_2, 100, "True_EEPs_2")
 
 
 # For the frequency extremes:

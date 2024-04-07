@@ -11,7 +11,7 @@ the EEPs and AEPs model matrices, and the exact gain solution.
 """
 
 import numpy as np
-from harp_beam import compute_EEPs, StEFCal, compute_array_pattern
+from harp_beam import compute_EEPs, StEFCal, StEFCal_2, compute_array_pattern
 from plot_funcs import plot_station_beam
 import scipy.io
 import os
@@ -125,4 +125,63 @@ plot_station_beam(
     P_AEP_X_dB,
     P_AEP_Y_dB,
     100,
+    "StEFCal",
+)
+
+
+# ---------------------------------------
+# Repeat for the optimised algorithm
+# ---------------------------------------
+
+# Run the SteEFCal algorithm for the AEP and EEPs model matrices
+
+G_AEP_2, diff_AEP_2, abs_error_AEP_2, amp_diff_AEP_2, phase_diff_AEP_2 = StEFCal_2(
+    M_AEP, R, tau, i_max, P, g_sol
+)
+
+G_EEPs_2, diff_EEPs_2, abs_error_EEPs_2, amp_diff_EEPs_2, phase_diff_EEPs_2 = StEFCal_2(
+    M_EEPs, R, tau, i_max, P, g_sol
+)
+
+# ----------------------------------------------
+# Get the array pattern to plot the station beam
+# ----------------------------------------------
+P_true_X = compute_array_pattern(
+    G_true, 1, v_theta_polX, v_phi_polX, x_pos, y_pos, theta, 0, 0, 0, 100
+)
+P_EEPs_X = compute_array_pattern(
+    G_EEPs_2, 1, v_theta_polX, v_phi_polX, x_pos, y_pos, theta, 0, 0, 0, 100
+)
+P_AEP_X = compute_array_pattern(
+    G_AEP_2, 1, v_theta_polX, v_phi_polX, x_pos, y_pos, theta, 0, 0, 0, 100
+)
+P_true_Y = compute_array_pattern(
+    G_true, 1, v_theta_polY, v_phi_polY, x_pos, y_pos, theta, 0, 0, 0, 100
+)
+P_EEPs_Y = compute_array_pattern(
+    G_EEPs_2, 1, v_theta_polY, v_phi_polY, x_pos, y_pos, theta, 0, 0, 0, 100
+)
+P_AEP_Y = compute_array_pattern(
+    G_AEP_2, 1, v_theta_polY, v_phi_polY, x_pos, y_pos, theta, 0, 0, 0, 100
+)
+
+# Get the patterns in dBV
+P_true_X_dB = 20 * np.log10(np.abs(P_true_X))
+P_EEPs_X_dB = 20 * np.log10(np.abs(P_EEPs_X))
+P_AEP_X_dB = 20 * np.log10(np.abs(P_AEP_X))
+P_true_Y_dB = 20 * np.log10(np.abs(P_true_Y))
+P_EEPs_Y_dB = 20 * np.log10(np.abs(P_EEPs_Y))
+P_AEP_Y_dB = 20 * np.log10(np.abs(P_AEP_Y))
+
+# Plot the station beam
+plot_station_beam(
+    theta,
+    P_true_X_dB,
+    P_true_Y_dB,
+    P_EEPs_X_dB,
+    P_EEPs_Y_dB,
+    P_AEP_X_dB,
+    P_AEP_Y_dB,
+    100,
+    "StEFCal_2",
 )

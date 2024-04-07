@@ -119,7 +119,15 @@ def plot_convergence(errors, iteration_number, model, error_type):
 
 
 def plot_station_beam(
-    theta, P_dB_X, P_dB_Y, P_EEPs_dB_X, P_EEPs_dB_Y, P_AEP_dB_X, P_AEP_dB_Y, frequency
+    theta,
+    P_dB_X,
+    P_dB_Y,
+    P_EEPs_dB_X,
+    P_EEPs_dB_Y,
+    P_AEP_dB_X,
+    P_AEP_dB_Y,
+    frequency,
+    algo,
 ):
     """
     @brief Plot the station beam
@@ -155,7 +163,13 @@ def plot_station_beam(
         linestyle=":",
     )
     ax[0].set_ylabel("Voltage (dBV)")
-    ax[0].set_title("Station beam for X feed, frequency = " + str(frequency) + "MHz")
+    ax[0].set_title(
+        "Station beam for X feed, frequency = "
+        + str(frequency)
+        + "MHz, \n and "
+        + algo
+        + " algorithm"
+    )
     ax[0].legend()
 
     ax[1].plot(theta, P_dB_Y, label="True array pattern Y feed", color="black")
@@ -175,7 +189,13 @@ def plot_station_beam(
     )
     ax[1].set_xlabel("Theta")
     ax[1].set_ylabel("Voltage (dBV)")
-    ax[1].set_title("Station beam for Y feed, frequency = " + str(frequency) + "MHz")
+    ax[1].set_title(
+        "Station beam for Y feed, frequency = "
+        + str(frequency)
+        + "MHz, \n and "
+        + algo
+        + " algorithm"
+    )
     ax[1].legend()
 
     plt.tight_layout()
@@ -185,7 +205,9 @@ def plot_station_beam(
     plot_dir = os.path.join(project_dir, "Plots")
     if not os.path.exists(plot_dir):
         os.makedirs(plot_dir)
-    plot_path = os.path.join(plot_dir, "Station_beam.png")
+    plot_path = os.path.join(
+        plot_dir, "Station_beam_" + str(frequency) + "_" + algo + ".png"
+    )
     plt.savefig(plot_path)
     plt.close()
 

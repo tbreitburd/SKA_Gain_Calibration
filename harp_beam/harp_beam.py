@@ -236,11 +236,11 @@ def StEFCal(M, R, tau, i_max, P, g_sol):
         if not np.allclose(G_new, np.diag(np.diagonal(G_new))):
             raise ValueError("G_new is not diagonal")
 
+        norm_diff = np.linalg.norm(np.abs(g_new) - np.abs(g_old))
+        norm_g = np.linalg.norm(np.abs(g_new))
+        diff.append(norm_diff / norm_g)
         # Check if the difference is smaller than tau
         if i % 2 == 0:
-            norm_diff = np.linalg.norm(np.abs(g_new) - np.abs(g_old))
-            norm_g = np.linalg.norm(np.abs(g_new))
-            diff.append(norm_diff / norm_g)
             # Get the absolute error between the estimated gains and the true gains
             if norm_diff / norm_g <= tau:
                 abs_error.append(np.linalg.norm(np.abs(g_new - g_sol)))
@@ -252,6 +252,69 @@ def StEFCal(M, R, tau, i_max, P, g_sol):
                 return G_new, diff, abs_error, amp_diff, phase_diff
             else:
                 g_new = (g_new + g_old) / 2
+        g_old = g_new.copy()
+
+        abs_error.append(np.linalg.norm(np.abs(g_new - g_sol)))
+        amp_diff.append(np.linalg.norm(np.abs(np.abs(g_new) - np.abs(g_sol))))
+        phase_diff.append(np.linalg.norm(np.abs(np.angle(g_new) - np.angle(g_sol))))
+
+    G_new = np.diag(g_new)
+    print("Did not converge before max iteration")
+    return G_new, diff, abs_error, amp_diff, phase_diff
+
+
+def StEFCal_2(M, R, tau, i_max, P, g_sol):
+    """
+    @brief Estimate the gains using the SteEFCal algorithm.
+
+    @param M Model covariance matric of observed scene, diagonal set to 0, np.array, complex
+    @param R array of covariance matrix, diagonal set to 0, np.array, complex
+    @param tau Tolerance, float
+    @param i_max Maximum number of iterations, int
+    @param P Number of antennas, int
+    @param g_sol Exact gain solution, np.array, complex
+
+    @return np.array (complex double) G_new
+    @return np.array (float) diff
+    @return np.array (float) abs_error
+    @return np.array (float) amp_diff
+    @return np.array (float) phase_diff
+    """
+
+    g_old = np.ones(P, dtype=complex)
+    g_new = np.ones(P, dtype=complex)
+    diff = []
+    # g_new = np.array(np.diag(G_new), dtype = complex)
+    # g_old = np.array(np.diag(G_old), dtype = complex)
+
+    abs_error = []
+    phase_diff = []
+    amp_diff = []
+
+    for i in range(0, i_max):
+        for p in range(0, P):
+            g_old = g_new.copy()
+            G_old = np.diag(g_old)
+            z = np.dot(G_old, M[:, p])
+            g_p = np.dot(np.conjugate(R[:, p]), z) / (np.dot(np.conjugate(z), z))
+            g_new[p] = g_p.flatten()[0]
+
+        # Check G_new is diagonal
+        # if not np.allclose(G_new, np.diag(np.diagonal(G_new))):
+        #    raise ValueError('G_new is not diagonal')
+
+        # Check if the difference is smaller than tau
+        norm_diff = np.linalg.norm(np.abs(g_new) - np.abs(g_old))
+        norm_g = np.linalg.norm(np.abs(g_new))
+        diff.append(norm_diff / norm_g)
+        # Get the absolute error between the estimated gains and the true gains
+        if norm_diff / norm_g <= tau:
+            abs_error.append(np.linalg.norm(np.abs(g_new - g_sol)))
+            amp_diff.append(np.linalg.norm(np.abs(np.abs(g_new) - np.abs(g_sol))))
+            phase_diff.append(np.linalg.norm(np.abs(np.angle(g_new) - np.angle(g_sol))))
+            G_new = np.diag(g_new)
+            return G_new, diff, abs_error, amp_diff, phase_diff
+
         g_old = g_new.copy()
 
         abs_error.append(np.linalg.norm(np.abs(g_new - g_sol)))

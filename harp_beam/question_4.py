@@ -8,7 +8,7 @@ number of iterations.
 @author Created by T.Breitburd on 19/03/2024
 """
 import numpy as np
-from harp_beam import StEFCal
+from harp_beam import StEFCal, StEFCal_2
 from plot_funcs import plot_convergence
 import scipy.io
 import os
@@ -57,3 +57,42 @@ print("Minimum absolute error achieved in the AEP model matrix: ", min_abs_error
 print("Reached at iteration number: ", np.argmin(abs_error_AEP))
 print("Minimum absolute error achieved in the EEPs model matrix: ", min_abs_error_EEPs)
 print("Reached at iteration number: ", np.argmin(abs_error_EEPs))
+
+# -------------------------------------------------
+# Run for the optimised version of the StEFCal code
+# -------------------------------------------------
+print("---------------------------------")
+print("Running the optimised version of the StEFCal code")
+print("---------------------------------")
+
+# Run the SteEFCal algorithm for the AEP and EEPs model matrices
+G_AEP_2, diff_AEP_2, abs_error_AEP_2, amp_diff_AEP_2, phase_diff_AEP_2 = StEFCal_2(
+    M_AEP, R, tau, i_max, P, g_sol
+)
+
+G_EEPs_2, diff_EEPs_2, abs_error_EEPs_2, amp_diff_EEPs_2, phase_diff_EEPs_2 = StEFCal_2(
+    M_EEPs, R, tau, i_max, P, g_sol
+)
+
+# Plot the convergence of the algorithm
+# (abs. error of gain sols, of their amplitude and their phase difference)
+
+plot_convergence(abs_error_AEP_2, i_max, "AEP_2", "Absolute")
+plot_convergence(amp_diff_AEP_2, i_max, "AEP_2", "Amplitude")
+plot_convergence(phase_diff_AEP_2, i_max, "AEP_2", "Phase")
+
+plot_convergence(abs_error_EEPs_2, i_max, "EEPs_2", "Absolute")
+plot_convergence(amp_diff_EEPs_2, i_max, "EEPs_2", "Amplitude")
+plot_convergence(phase_diff_EEPs_2, i_max, "EEPs_2", "Phase")
+
+
+# Get the minimum error achieved in the AEP and EEPs model matrices
+min_abs_error_AEP_2 = min(abs_error_AEP_2)
+min_abs_error_EEPs_2 = min(abs_error_EEPs_2)
+
+print("Minimum absolute error achieved in the AEP model matrix: ", min_abs_error_AEP_2)
+print("Reached at iteration number: ", np.argmin(abs_error_AEP_2))
+print(
+    "Minimum absolute error achieved in the EEPs model matrix: ", min_abs_error_EEPs_2
+)
+print("Reached at iteration number: ", np.argmin(abs_error_EEPs_2))
